@@ -1,6 +1,10 @@
+import 'package:eshop/locator.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  setupLocator();
   runApp(const MyApp());
 }
 
