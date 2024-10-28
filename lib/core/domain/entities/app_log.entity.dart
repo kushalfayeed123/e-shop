@@ -1,7 +1,7 @@
 import 'package:eshop/core/domain/entities/device.entity.dart';
 
 class AppLog {
-  String? logId;
+  String? id;
   String? userId;
   String? eventType;
   String? timestamp;
@@ -9,7 +9,7 @@ class AppLog {
   String? description;
 
   AppLog(
-      {this.logId,
+      {this.id,
       this.userId,
       this.eventType,
       this.timestamp,
@@ -17,24 +17,22 @@ class AppLog {
       this.description});
 
   AppLog.fromJson(Map<String, dynamic> json) {
-    logId = json['log_id'];
-    userId = json['user_id'];
-    eventType = json['event_type'];
+    id = json['id'];
+    userId = json['userId'];
+    eventType = json['eventType'];
     timestamp = json['timestamp'];
-    device = json['device_info'] != null
-        ? Device.fromJson(json['device_info'])
-        : null;
+    device = json['device'] != null ? Device.fromJson(json['device']) : null;
     description = json['description'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['log_id'] = logId;
-    data['user_id'] = userId;
-    data['event_type'] = eventType;
+    data['id'] = id;
+    data['userId'] = userId;
+    data['eventType'] = eventType;
     data['timestamp'] = timestamp;
     if (device != null) {
-      data['device_info'] = device!.toJson();
+      data['device'] = device!.toJson();
     }
     data['description'] = description;
     return data;

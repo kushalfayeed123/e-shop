@@ -1,24 +1,25 @@
 class Device {
-  String? deviceId;
+  String? id;
   String? deviceType;
   String? appVersion;
   String? osVersion;
+  String? token;
 
-  Device({this.deviceId, this.deviceType, this.appVersion, this.osVersion});
+  Device({this.id, this.deviceType, this.appVersion, this.osVersion});
 
   Device.fromJson(Map<String, dynamic> json) {
-    deviceId = json['device_id'];
-    deviceType = json['device_type'];
-    appVersion = json['app_version'];
-    osVersion = json['os_version'];
+    id = json['id'];
+    deviceType = json['deviceType'];
+    appVersion = json['appVersion'];
+    osVersion = json['osVersion'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['device_id'] = deviceId;
-    data['device_type'] = deviceType;
-    data['app_version'] = appVersion;
-    data['os_version'] = osVersion;
+    data['id'] = id;
+    data['deviceType'] = deviceType;
+    data['appVersion'] = appVersion;
+    data['osVersion'] = osVersion;
     return data;
   }
 }

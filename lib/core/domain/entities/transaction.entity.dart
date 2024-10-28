@@ -1,8 +1,8 @@
 import 'package:eshop/core/domain/entities/discount.entity.dart';
 import 'package:eshop/core/domain/entities/product.entity.dart';
 
-class Transaction {
-  String? transactionId;
+class TransactionModel {
+  String? id;
   String? userId;
   String? customerId;
   String? transactionType;
@@ -16,26 +16,27 @@ class Transaction {
   String? notes;
   List<Discount>? discounts;
 
-  Transaction(
-      {this.transactionId,
-      this.userId,
-      this.customerId,
-      this.transactionType,
-      this.items,
-      this.subtotal,
-      this.tax,
-      this.totalAmount,
-      this.paymentMethod,
-      this.transactionDate,
-      this.status,
-      this.notes,
-      this.discounts});
+  TransactionModel({
+    this.id,
+    this.userId,
+    this.customerId,
+    this.transactionType,
+    this.items,
+    this.subtotal,
+    this.tax,
+    this.totalAmount,
+    this.paymentMethod,
+    this.transactionDate,
+    this.status,
+    this.notes,
+    this.discounts,
+  });
 
-  Transaction.fromJson(Map<String, dynamic> json) {
-    transactionId = json['transaction_id'];
-    userId = json['user_id'];
-    customerId = json['customer_id'];
-    transactionType = json['transaction_type'];
+  TransactionModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['userId'];
+    customerId = json['customerId'];
+    transactionType = json['transactionType'];
     if (json['items'] != null) {
       items = <Product>[];
       json['items'].forEach((v) {
@@ -44,9 +45,9 @@ class Transaction {
     }
     subtotal = json['subtotal'];
     tax = json['tax'];
-    totalAmount = json['total_amount'];
-    paymentMethod = json['payment_method'];
-    transactionDate = json['transaction_date'];
+    totalAmount = json['totalAmount'];
+    paymentMethod = json['paymentMethod'];
+    transactionDate = json['transactionDate'];
     status = json['status'];
     notes = json['notes'];
     if (json['discounts'] != null) {
@@ -59,18 +60,18 @@ class Transaction {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['transaction_id'] = transactionId;
-    data['user_id'] = userId;
-    data['customer_id'] = customerId;
-    data['transaction_type'] = transactionType;
+    data['id'] = id;
+    data['userId'] = userId;
+    data['customerId'] = customerId;
+    data['transactionType'] = transactionType;
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
     }
     data['subtotal'] = subtotal;
     data['tax'] = tax;
-    data['total_amount'] = totalAmount;
-    data['payment_method'] = paymentMethod;
-    data['transaction_date'] = transactionDate;
+    data['totalAmount'] = totalAmount;
+    data['paymentMethod'] = paymentMethod;
+    data['transactionDate'] = transactionDate;
     data['status'] = status;
     data['notes'] = notes;
     if (discounts != null) {

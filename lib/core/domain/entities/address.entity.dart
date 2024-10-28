@@ -11,7 +11,7 @@ class Address {
     street = json['street'];
     city = json['city'];
     state = json['state'];
-    zipCode = json['zip_code'];
+    zipCode = json['zipCode'];
     country = json['country'];
   }
 
@@ -20,7 +20,7 @@ class Address {
     data['street'] = street;
     data['city'] = city;
     data['state'] = state;
-    data['zip_code'] = zipCode;
+    data['zipCode'] = zipCode;
     data['country'] = country;
     return data;
   }

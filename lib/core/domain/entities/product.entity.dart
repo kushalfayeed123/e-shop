@@ -1,7 +1,7 @@
 import 'package:eshop/core/domain/entities/product_attributes.entity.dart';
 
 class Product {
-  String? productId;
+  String? id;
   String? name;
   String? description;
   String? sku;
@@ -21,7 +21,7 @@ class Product {
   String? updatedAt;
 
   Product(
-      {this.productId,
+      {this.id,
       this.name,
       this.description,
       this.sku,
@@ -41,50 +41,50 @@ class Product {
       this.updatedAt});
 
   Product.fromJson(Map<String, dynamic> json) {
-    productId = json['product_id'];
+    id = json['id'];
     name = json['name'];
     description = json['description'];
     sku = json['sku'];
     barcode = json['barcode'];
     category = json['category'];
-    supplierId = json['supplier_id'];
-    costPrice = json['cost_price'];
-    sellingPrice = json['selling_price'];
-    quantityOnHand = json['quantity_on_hand'];
-    quantityReserved = json['quantity_reserved'];
-    reorderLevel = json['reorder_level'];
-    reorderQuantity = json['reorder_quantity'];
+    supplierId = json['supplierId'];
+    costPrice = json['costPrice'];
+    sellingPrice = json['sellingPrice'];
+    quantityOnHand = json['quantityOnHand'];
+    quantityReserved = json['quantityReserved'];
+    reorderLevel = json['reorderLevel'];
+    reorderQuantity = json['reorderQuantity'];
     status = json['status'];
     attributes = json['attributes'] != null
         ? Attributes.fromJson(json['attributes'])
         : null;
     images = json['images'].cast<String>();
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['product_id'] = productId;
+    data['id'] = id;
     data['name'] = name;
     data['description'] = description;
     data['sku'] = sku;
     data['barcode'] = barcode;
     data['category'] = category;
-    data['supplier_id'] = supplierId;
-    data['cost_price'] = costPrice;
-    data['selling_price'] = sellingPrice;
-    data['quantity_on_hand'] = quantityOnHand;
-    data['quantity_reserved'] = quantityReserved;
-    data['reorder_level'] = reorderLevel;
-    data['reorder_quantity'] = reorderQuantity;
+    data['supplierId'] = supplierId;
+    data['costPrice'] = costPrice;
+    data['sellingPrice'] = sellingPrice;
+    data['quantityOnHand'] = quantityOnHand;
+    data['quantityReserved'] = quantityReserved;
+    data['reorderLevel'] = reorderLevel;
+    data['reorderQuantity'] = reorderQuantity;
     data['status'] = status;
     if (attributes != null) {
       data['attributes'] = attributes!.toJson();
     }
     data['images'] = images;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }

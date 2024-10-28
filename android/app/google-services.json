@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "105251594410",
+    "project_id": "eshop-vibeswine",
+    "storage_bucket": "eshop-vibeswine.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105251594410:android:7d66718e9d68d01e5af0d3",
+        "android_client_info": {
+          "package_name": "com.eshop.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy1LUzEkSNUmo0dRFkh53FOGtlxC0t2KQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

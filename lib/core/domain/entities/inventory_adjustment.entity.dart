@@ -19,10 +19,10 @@ class InventoryAdjustment {
       this.timestamp});
 
   InventoryAdjustment.fromJson(Map<String, dynamic> json) {
-    adjustmentId = json['adjustment_id'];
-    productId = json['product_id'];
-    userId = json['user_id'];
-    adjustmentType = json['adjustment_type'];
+    adjustmentId = json['adjustmentId'];
+    productId = json['productId'];
+    userId = json['userId'];
+    adjustmentType = json['adjustmentType'];
     quantity = json['quantity'];
     reason = json['reason'];
     notes = json['notes'];
@@ -31,10 +31,10 @@ class InventoryAdjustment {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['adjustment_id'] = adjustmentId;
-    data['product_id'] = productId;
-    data['user_id'] = userId;
-    data['adjustment_type'] = adjustmentType;
+    data['adjustmentId'] = adjustmentId;
+    data['productId'] = productId;
+    data['userId'] = userId;
+    data['adjustmentType'] = adjustmentType;
     data['quantity'] = quantity;
     data['reason'] = reason;
     data['notes'] = notes;

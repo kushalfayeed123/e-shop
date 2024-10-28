@@ -1,7 +1,7 @@
 import 'package:eshop/core/domain/entities/address.entity.dart';
 
 class Supplier {
-  String? supplierId;
+  String? id;
   String? name;
   String? contactPerson;
   String? email;
@@ -12,7 +12,7 @@ class Supplier {
   String? updatedAt;
 
   Supplier(
-      {this.supplierId,
+      {this.id,
       this.name,
       this.contactPerson,
       this.email,
@@ -23,31 +23,31 @@ class Supplier {
       this.updatedAt});
 
   Supplier.fromJson(Map<String, dynamic> json) {
-    supplierId = json['supplier_id'];
+    id = json['id'];
     name = json['name'];
-    contactPerson = json['contact_person'];
+    contactPerson = json['contactPerson'];
     email = json['email'];
     phone = json['phone'];
     address =
         json['address'] != null ? Address.fromJson(json['address']) : null;
-    productsSupplied = json['products_supplied'].cast<String>();
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    productsSupplied = json['productsSupplied'].cast<String>();
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['supplier_id'] = supplierId;
+    data['supplier_id'] = id;
     data['name'] = name;
-    data['contact_person'] = contactPerson;
+    data['contactPerson'] = contactPerson;
     data['email'] = email;
     data['phone'] = phone;
     if (address != null) {
       data['address'] = address!.toJson();
     }
-    data['products_supplied'] = productsSupplied;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+    data['productsSupplied'] = productsSupplied;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }

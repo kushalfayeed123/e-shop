@@ -1,5 +1,5 @@
 class StockLog {
-  String? logId;
+  String? id;
   String? productId;
   String? userId;
   String? changeType;
@@ -8,7 +8,7 @@ class StockLog {
   String? notes;
 
   StockLog(
-      {this.logId,
+      {this.id,
       this.productId,
       this.userId,
       this.changeType,
@@ -17,22 +17,22 @@ class StockLog {
       this.notes});
 
   StockLog.fromJson(Map<String, dynamic> json) {
-    logId = json['log_id'];
-    productId = json['product_id'];
-    userId = json['user_id'];
-    changeType = json['change_type'];
-    remainingStock = json['remaining_stock'];
+    id = json['id'];
+    productId = json['productId'];
+    userId = json['userId'];
+    changeType = json['changeType'];
+    remainingStock = json['remainingStock'];
     timestamp = json['timestamp'];
     notes = json['notes'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['log_id'] = logId;
-    data['product_id'] = productId;
-    data['user_id'] = userId;
-    data['change_type'] = changeType;
-    data['remaining_stock'] = remainingStock;
+    data['log_id'] = id;
+    data['productId'] = productId;
+    data['userId'] = userId;
+    data['changeType'] = changeType;
+    data['remainingStock'] = remainingStock;
     data['timestamp'] = timestamp;
     data['notes'] = notes;
     return data;
