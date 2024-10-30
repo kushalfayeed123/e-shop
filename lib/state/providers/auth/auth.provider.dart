@@ -1,6 +1,7 @@
 import 'package:eshop/core/domain/abstractions/auth.abstraction.dart';
 import 'package:eshop/locator.dart';
 import 'package:eshop/state/models/auth.state.model.dart';
+import 'package:eshop/state/providers/user/user.provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'auth.provider.g.dart';
@@ -32,6 +33,7 @@ class AuthState extends _$AuthState {
                   : true,
           signedInUser: user.user?.uid ?? '');
       state = AsyncValue.data(res);
+      // ref.read(userStateProvider.notifier).
     } catch (e, s) {
       state = AsyncValue.error(e, s);
       rethrow;
