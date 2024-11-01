@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class OrdersScreen extends StatelessWidget {
+  const OrdersScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF121212),
+      backgroundColor: const Color(0xFF121212),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             // Header
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
@@ -26,7 +28,7 @@ class OrdersScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Order Filters
             Row(
               children: [
@@ -35,7 +37,7 @@ class OrdersScreen extends StatelessWidget {
                 _buildFilterButton("Completed", false),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Order Cards
             Expanded(
               child: ListView(
@@ -54,17 +56,18 @@ class OrdersScreen extends StatelessWidget {
 
   Widget _buildFilterButton(String label, bool isActive) {
     return Padding(
-      padding: EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 8.0),
       child: TextButton(
         style: TextButton.styleFrom(
-          backgroundColor: isActive ? Color(0xFFFFD700) : Color(0xFF333333),
+          backgroundColor:
+              isActive ? const Color(0xFFFFD700) : const Color(0xFF333333),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         ),
         onPressed: () {},
         child: Text(
           label,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );
@@ -72,25 +75,26 @@ class OrdersScreen extends StatelessWidget {
 
   Widget _buildOrderCard(String name, String status, double total) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.0),
-      padding: EdgeInsets.all(16.0),
+      margin: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Color(0xFF1E1E1E),
+        color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(name,
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(status,
-              style: TextStyle(color: Color(0xFFFFD700), fontSize: 16)),
-          SizedBox(height: 8),
-          Text("\$$total", style: TextStyle(color: Colors.white, fontSize: 20)),
+              style: const TextStyle(color: Color(0xFFFFD700), fontSize: 16)),
+          const SizedBox(height: 8),
+          Text("\$$total",
+              style: const TextStyle(color: Colors.white, fontSize: 20)),
         ],
       ),
     );

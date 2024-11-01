@@ -32,8 +32,8 @@ class AuthState extends _$AuthState {
                   ? false
                   : true,
           signedInUser: user.user?.uid ?? '');
+      await ref.read(userStateProvider.notifier).getCurrentUser();
       state = AsyncValue.data(res);
-      // ref.read(userStateProvider.notifier).
     } catch (e, s) {
       state = AsyncValue.error(e, s);
       rethrow;

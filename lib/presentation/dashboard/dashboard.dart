@@ -1,60 +1,59 @@
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF121212),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Dashboard",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "Wednesday, 12 July 2023",
-                  style: TextStyle(color: Color(0xFFB3B3B3), fontSize: 14),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            // Info Cards
-            Row(
-              children: [
-                _buildInfoCard(
-                    "New Orders", "16", Color(0xFF1E1E1E), Color(0xFFB3B3B3)),
-                _buildInfoCard(
-                    "Total Orders", "86", Color(0xFF1E1E1E), Color(0xFFB3B3B3)),
-                _buildInfoCard(
-                    "Waiting List", "9", Color(0xFF1E1E1E), Color(0xFFB3B3B3)),
-              ],
-            ),
-            SizedBox(height: 20),
-            // Order List and Payment sections
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildOrderList(),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: _buildPopularDishesSection(),
-                  ),
-                ],
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // Header
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Dashboard",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
               ),
+              Text(
+                "Wednesday, 12 July 2023",
+                style: TextStyle(color: Color(0xFFB3B3B3), fontSize: 14),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Info Cards
+          Row(
+            children: [
+              _buildInfoCard("New Orders", "16", const Color(0xFF1E1E1E),
+                  const Color(0xFFB3B3B3)),
+              _buildInfoCard("Total Orders", "86", const Color(0xFF1E1E1E),
+                  const Color(0xFFB3B3B3)),
+              _buildInfoCard("Waiting List", "9", const Color(0xFF1E1E1E),
+                  const Color(0xFFB3B3B3)),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Order List and Payment sections
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildOrderList(),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildPopularDishesSection(),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -63,8 +62,8 @@ class DashboardScreen extends StatelessWidget {
       String title, String value, Color bgColor, Color textColor) {
     return Expanded(
       child: Container(
-        margin: EdgeInsets.all(8.0),
-        padding: EdgeInsets.all(16.0),
+        margin: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(12),
@@ -75,10 +74,10 @@ class DashboardScreen extends StatelessWidget {
               title,
               style: TextStyle(color: textColor, fontSize: 16),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
@@ -91,12 +90,12 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildOrderList() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1E1E1E),
+        color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
+      child: const Column(
         children: [
           Text(
             "Order List",
@@ -110,12 +109,12 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildPopularDishesSection() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1E1E1E),
+        color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
+      child: const Column(
         children: [
           Text(
             "Popular Dishes",

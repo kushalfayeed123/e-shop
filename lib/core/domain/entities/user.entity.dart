@@ -36,8 +36,8 @@ class UserModel {
     email = json['email'];
     phone = json['phone'];
     role = json['role'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    createdAt = json['createdAt'].toString();
+    updatedAt = json['updatedAt'].toString();
     status = json['status'];
     permissions = json['permissions'] != null
         ? Permissions.fromJson(json['permissions'])
