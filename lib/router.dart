@@ -1,6 +1,7 @@
 import 'package:eshop/presentation/auth/login.dart';
 import 'package:eshop/presentation/dashboard/dashboard.dart';
 import 'package:eshop/presentation/orders/orders.dart';
+import 'package:eshop/presentation/products/product_list.dart';
 import 'package:eshop/presentation/shared/app_layout.dart';
 import 'package:eshop/presentation/splash/splash.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +122,7 @@ final routerProvider = Provider.autoDispose<GoRouter>((ref) {
               pageBuilder: (context, state) {
                 return CustomTransitionPage(
                     key: UniqueKey(),
-                    child: const SizedBox(),
+                    child: const ProductList(),
                     transitionDuration: const Duration(seconds: 1),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {

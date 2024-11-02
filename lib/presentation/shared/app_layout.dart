@@ -1,4 +1,5 @@
 import 'package:eshop/presentation/shared/models/side_nav_item.model.dart';
+import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -54,10 +55,7 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
 
   void fetchData(bool fetchLocation) async {
     try {
-      // await ref
-      //     .read<Dashboard>(dashboardProvider.notifier)
-      //     .fetchDashboardData();
-      // await ref.read<Dashboard>(dashboardProvider.notifier).getUserLocation();
+      await ref.read(productStateProvider.notifier).getProducts();
     } catch (e) {
       if (kDebugMode) {
         print(e.toString());
@@ -174,12 +172,12 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
                         Row(
                           children: [
                             CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.blueGrey,
                               child: Image.asset(
                                 'assets/images/user.png',
                                 width: 25,
                               ),
-                              radius: 25,
-                              backgroundColor: Colors.blueGrey,
                             ),
                             const SizedBox(
                               width: 20,
