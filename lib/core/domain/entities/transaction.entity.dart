@@ -32,8 +32,8 @@ class TransactionModel {
     this.discounts,
   });
 
-  TransactionModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+  TransactionModel.fromJson(Map<String, dynamic> json, String did) {
+    id = did;
     userId = json['userId'];
     customerId = json['customerId'];
     transactionType = json['transactionType'];

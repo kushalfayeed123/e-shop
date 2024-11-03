@@ -47,7 +47,7 @@ class AppButton extends StatelessWidget {
               height: height,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(1000),
+                  borderRadius: BorderRadius.circular(10),
                   color: !isActive ? background.withOpacity(0.5) : background,
                   border: hasBorder
                       ? Border.all(color: Theme.of(context).colorScheme.primary)
@@ -66,7 +66,7 @@ class AppButton extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
-                              ?.copyWith(color: textColor, fontSize: 24),
+                              ?.copyWith(color: textColor, fontSize: 16),
                         ),
                         (subText ?? '').isNotEmpty
                             ? Text(

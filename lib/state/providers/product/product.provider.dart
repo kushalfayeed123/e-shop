@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:eshop/core/domain/abstractions/product.abstraction.dart';
+import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/locator.dart';
 import 'package:eshop/state/models/product.state.model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -20,22 +23,63 @@ class ProductState extends _$ProductState {
   }
 
   Future<void> getProducts() async {
-    final currentState = state.asData?.value;
-    final res = await _productService.getProducts();
-    final newStateSlice = ProductStateModel(
-      products: res,
-      currentProduct: currentState?.currentProduct,
-    );
-    setState(newStateSlice);
+    try {
+      final currentState = state.asData?.value;
+      final res = await _productService.getProducts();
+      final newStateSlice = ProductStateModel(
+        products: res,
+        currentProduct: currentState?.currentProduct,
+      );
+      setState(newStateSlice);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> getProduct(String id) async {
-    final currentState = state.asData?.value;
-    final res = await _productService.getProduct(id);
-    final newStateSlice = ProductStateModel(
-      products: currentState?.products,
-      currentProduct: res,
-    );
-    setState(newStateSlice);
+    try {
+      final currentState = state.asData?.value;
+      final res = await _productService.getProduct(id);
+      final newStateSlice = ProductStateModel(
+        products: currentState?.products,
+        currentProduct: res,
+      );
+      setState(newStateSlice);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> createProduct(Product payload) async {
+    try {
+      final products = state.asData?.value.products;
+      if ((products ?? [])
+          .any((e) => e.name == payload.name && e.sku == payload.sku)) {
+        throw const HttpException('Product already exists');
+      } else {
+        await _productService.createProduct(payload);
+        await getProducts();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateProduct(Product payload) async {
+    try {
+      await _productService.updateProduct(payload);
+      await getProducts();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteProduct(String id) async {
+    try {
+      await _productService.deleteProduct(id);
+      await getProducts();
+    } catch (e) {
+      rethrow;
+    }
   }
 }

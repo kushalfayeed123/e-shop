@@ -5,18 +5,17 @@ class Product {
   String? name;
   String? description;
   String? sku;
-  String? barcode;
   String? category;
   String? supplierId;
-  double? costPrice;
-  int? sellingPrice;
-  int? quantityOnHand;
-  int? quantityReserved;
-  int? reorderLevel;
-  int? reorderQuantity;
+  String? costPrice;
+  String? sellingPrice;
+  String? quantityOnHand;
+  String? quantityReserved;
+  String? reorderLevel;
+  String? reorderQuantity;
   String? status;
   Attributes? attributes;
-  List<String>? images;
+  String? image;
   String? createdAt;
   String? updatedAt;
 
@@ -25,7 +24,6 @@ class Product {
       this.name,
       this.description,
       this.sku,
-      this.barcode,
       this.category,
       this.supplierId,
       this.costPrice,
@@ -36,7 +34,7 @@ class Product {
       this.reorderQuantity,
       this.status,
       this.attributes,
-      this.images,
+      this.image,
       this.createdAt,
       this.updatedAt});
 
@@ -45,7 +43,6 @@ class Product {
     name = json['name'];
     description = json['description'];
     sku = json['sku'];
-    barcode = json['barcode'];
     category = json['category'];
     supplierId = json['supplierId'];
     costPrice = json['costPrice'];
@@ -58,7 +55,7 @@ class Product {
     attributes = json['attributes'] != null
         ? Attributes.fromJson(json['attributes'])
         : null;
-    images = json['images'].cast<String>();
+    image = json['image'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
   }
@@ -69,7 +66,6 @@ class Product {
     data['name'] = name;
     data['description'] = description;
     data['sku'] = sku;
-    data['barcode'] = barcode;
     data['category'] = category;
     data['supplierId'] = supplierId;
     data['costPrice'] = costPrice;
@@ -82,7 +78,7 @@ class Product {
     if (attributes != null) {
       data['attributes'] = attributes!.toJson();
     }
-    data['images'] = images;
+    data['image'] = image;
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
     return data;

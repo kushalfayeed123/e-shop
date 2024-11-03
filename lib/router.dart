@@ -1,5 +1,6 @@
 import 'package:eshop/presentation/auth/login.dart';
 import 'package:eshop/presentation/dashboard/dashboard.dart';
+import 'package:eshop/presentation/orders/create_order.dart';
 import 'package:eshop/presentation/orders/orders.dart';
 import 'package:eshop/presentation/products/product_list.dart';
 import 'package:eshop/presentation/shared/app_layout.dart';
@@ -50,6 +51,28 @@ final routerProvider = Provider.autoDispose<GoRouter>((ref) {
         return CustomTransitionPage(
             key: UniqueKey(),
             child: const LoginScreen(),
+            reverseTransitionDuration: const Duration(seconds: 1),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(0.75, 0),
+                    end: Offset.zero,
+                  ).chain(CurveTween(curve: Curves.easeIn)),
+                ),
+                child: child,
+              );
+            });
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: '/newOrder',
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+            key: UniqueKey(),
+            child: const CreateOrder(),
             reverseTransitionDuration: const Duration(seconds: 1),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {

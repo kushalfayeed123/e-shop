@@ -1,8 +1,8 @@
 import 'package:eshop/presentation/shared/models/side_nav_item.model.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
+import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -56,6 +56,7 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
   void fetchData(bool fetchLocation) async {
     try {
       await ref.read(productStateProvider.notifier).getProducts();
+      await ref.read(transactionStateProvider.notifier).getTransactions();
     } catch (e) {
       if (kDebugMode) {
         print(e.toString());
@@ -65,6 +66,8 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(productStateProvider);
+    ref.watch(transactionStateProvider);
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -149,7 +152,7 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
                                                 e.text ?? '',
                                                 style: Theme.of(context)
                                                     .textTheme
-                                                    .bodyLarge!
+                                                    .bodyMedium!
                                                     .copyWith(
                                                         color: (e.isActive ??
                                                                 false)

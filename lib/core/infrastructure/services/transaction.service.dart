@@ -32,7 +32,7 @@ class TransactionService implements ITransactionService {
       final snapshot =
           await _transactionDataCollectionReference.doc(transactionId).get();
       return snapshot.exists
-          ? TransactionModel.fromJson(snapshot.data()!)
+          ? TransactionModel.fromJson(snapshot.data()!, snapshot.id)
           : throw const HttpException('Transaction not found');
     } on FirebaseException catch (e) {
       final message = e.message ?? '';
@@ -48,11 +48,9 @@ class TransactionService implements ITransactionService {
   @override
   Future<List<TransactionModel>> getTransactions() async {
     try {
-      final snapshots = await _transactionDataCollectionReference
-          .where('status', isEqualTo: 'Active')
-          .get();
+      final snapshots = await _transactionDataCollectionReference.get();
       return snapshots.docs
-          .map((e) => TransactionModel.fromJson(e.data()))
+          .map((e) => TransactionModel.fromJson(e.data(), e.id))
           .toList();
     } on FirebaseException catch (e) {
       final message = e.message ?? '';

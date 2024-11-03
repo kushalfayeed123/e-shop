@@ -12,7 +12,7 @@ class ProductService implements IProductService {
   Future<void> createProduct(Product product) async {
     try {
       await _productDataCollectionReference
-          .doc(product.id)
+          .doc(product.sku)
           .set(product.toJson());
     } on FirebaseException catch (e) {
       final message = e.message ?? '';
@@ -83,7 +83,7 @@ class ProductService implements IProductService {
   Future<void> updateProduct(Product product) async {
     try {
       await _productDataCollectionReference
-          .doc(product.id)
+          .doc(product.sku)
           .update(product.toJson());
     } on FirebaseException catch (e) {
       final message = e.message ?? '';
