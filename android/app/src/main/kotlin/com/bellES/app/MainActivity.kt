@@ -1,4 +1,4 @@
-package com.eshop.app
+package com.bellES.app
 
 import io.flutter.embedding.android.FlutterActivity
 
