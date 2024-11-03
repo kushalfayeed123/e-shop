@@ -1,4 +1,4 @@
-import 'package:eshop/presentation/shared/app_dialog.dart';
+import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/state/providers/auth/auth.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

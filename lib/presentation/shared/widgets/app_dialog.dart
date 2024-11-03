@@ -1,4 +1,4 @@
-import 'package:eshop/presentation/shared/app_button.dart';
+import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
@@ -84,7 +84,7 @@ class AppDialog {
                             action: () {
                               context.pop();
                             },
-                            textColor: Colors.white,
+                            textColor: Colors.black,
                             text: 'OK',
                             hasBorder: false,
                             elevation: 0)
@@ -147,7 +147,7 @@ class AppDialog {
                               context.pop();
                             }
                           },
-                          textColor: Colors.white,
+                          textColor: Colors.black,
                           text: 'OK',
                           hasBorder: false,
                           elevation: 0)
@@ -213,7 +213,7 @@ class AppDialog {
                         confirmAction != null && confirmAction();
                         context.pop();
                       },
-                      textColor: Colors.white,
+                      textColor: Colors.black,
                       text: confirmText,
                       hasBorder: false,
                       elevation: 0),
@@ -239,7 +239,7 @@ class AppDialog {
                   ? MediaQuery.of(context).size.width * 0.4
                   : MediaQuery.of(context).size.width,
               child: AlertDialog(
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.black,
                 insetPadding: EdgeInsets.symmetric(
                     horizontal:
                         ResponsiveBreakpoints.of(context).largerThan(MOBILE)
@@ -279,7 +279,7 @@ class AppDialog {
                       children: [
                         AppButton(
                             isActive: true,
-                            background: Colors.white,
+                            background: Colors.black,
                             action: () {
                               context.pop();
                             },
@@ -300,7 +300,7 @@ class AppDialog {
                                 action: () {
                                   dialogAction();
                                 },
-                                textColor: Colors.white,
+                                textColor: Colors.black,
                                 text: dialogActionText,
                                 hasBorder: false,
                                 elevation: 0)

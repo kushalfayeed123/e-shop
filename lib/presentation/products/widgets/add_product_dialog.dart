@@ -4,15 +4,17 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:eshop/core/domain/entities/product.entity.dart';
-import 'package:eshop/presentation/shared/app_button.dart';
-import 'package:eshop/presentation/shared/app_dialog.dart';
+import 'package:eshop/presentation/shared/widgets/app_button.dart';
+import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:uuid/uuid.dart';
 
 class AddProductDialog extends ConsumerStatefulWidget
@@ -26,9 +28,7 @@ class AddProductDialog extends ConsumerStatefulWidget
 
 class AddProductDialogState extends ConsumerState<AddProductDialog> {
   final _formKey = GlobalKey<FormState>();
-  final MobileScannerController controller = MobileScannerController(
-      // required options for the scanner
-      );
+  final MobileScannerController controller = MobileScannerController();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -54,6 +54,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   int? reorderQuantity;
   String? status;
   File? image;
+  String downloadLink = '';
   bool barcodeScanned = false;
 
   @override
@@ -77,6 +78,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
       _categoryController.text = product?.category ?? '';
       _costPriceController.text = product?.costPrice ?? '';
       _sellingPriceController.text = product?.sellingPrice ?? '';
+      downloadLink = product?.image ?? '';
       image = File(product?.image ?? '');
     }
     setState(() {});
@@ -136,7 +138,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
                         color: const Color.fromARGB(255, 53, 56, 58),
                         borderRadius: BorderRadius.circular(5)),
                     child: Center(
-                      child: image != null
+                      child: downloadLink.isNotEmpty
                           ? Image.network(
                               image?.path ?? '',
                               fit: BoxFit.contain,
@@ -296,9 +298,9 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
           sellingPrice: _sellingPriceController.text,
           quantityOnHand: _quantityController.text,
           quantityReserved: _quantityController.text,
-          image: (widget.isEdit && (image?.path ?? '').isEmpty)
+          image: (widget.isEdit && (downloadLink).isEmpty)
               ? product?.image
-              : image?.path ?? '',
+              : downloadLink,
           status: widget.isEdit ? product?.status ?? '' : 'Active',
           createdAt: widget.isEdit
               ? (product?.createdAt ?? '')
@@ -335,6 +337,8 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
     if (kDebugMode) {
       print(barcode.barcodes[0].rawValue);
     }
+    _idController.text = barcode.barcodes[0].rawValue ?? '';
+    setState(() {});
     context.pop();
   }
 
@@ -351,9 +355,13 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
           width: screenWidth * 0.5,
           height: screenHeight * 0.6,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
-          child: MobileScanner(
-            controller: controller,
-            onDetect: (barcodes) => _handleBarcode,
+          child: RotatedBox(
+            quarterTurns:
+                ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
+            child: MobileScanner(
+              controller: controller,
+              onDetect: (value) => _handleBarcode,
+            ),
           ),
         ),
       ),
@@ -361,10 +369,26 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   }
 
   void _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final xImage = await picker.pickImage(source: ImageSource.gallery);
-    image = File(xImage?.path ?? '');
-    setState(() {});
+    try {
+      final ImagePicker picker = ImagePicker();
+      final xImage = await picker.pickImage(source: ImageSource.gallery);
+      image = File(xImage?.path ?? '');
+
+      final ref = FirebaseStorage.instanceFor(
+              bucket: "gs://grocery-app-ea4b9.appspot.com")
+          .ref();
+      if (kIsWeb) {
+        await ref.putData((image ?? File('')).readAsBytesSync());
+      } else {
+        await ref.putFile(File(image?.path ?? ''));
+      }
+
+      downloadLink = await ref.getDownloadURL();
+
+      setState(() {});
+    } catch (e) {
+      AppDialog.showErrorDialog(context, 'Unable to upload image: $e');
+    }
   }
 
   Widget _buildTextField(String label, TextEditingController controller) {

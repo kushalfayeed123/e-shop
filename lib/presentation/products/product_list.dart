@@ -1,6 +1,6 @@
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/presentation/products/widgets/add_product_dialog.dart';
-import 'package:eshop/presentation/shared/app_button.dart';
+import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:eshop/presentation/products/widgets/product_card.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:flutter/material.dart';

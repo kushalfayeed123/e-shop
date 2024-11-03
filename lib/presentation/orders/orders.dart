@@ -1,5 +1,6 @@
 import 'package:eshop/core/domain/entities/transaction.entity.dart';
-import 'package:eshop/presentation/shared/app_button.dart';
+import 'package:eshop/presentation/shared/constants.dart';
+import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,8 +121,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   }
 
   Widget _buildOrderCard(TransactionModel order) {
-    final oCcy = NumberFormat("#,##0.00", "en_US");
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
       padding: const EdgeInsets.all(16.0),
@@ -260,7 +259,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                             SizedBox(
                               width: 50,
                               child: Text(
-                                '₦${oCcy.format(int.parse(e.sellingPrice ?? '0'))}',
+                                '₦${oCcy.format(double.parse(e.sellingPrice ?? '0'))}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!

@@ -1,5 +1,6 @@
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/core/domain/entities/transaction.entity.dart';
+import 'package:eshop/presentation/shared/constants.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:flutter/material.dart';
@@ -114,6 +115,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         .where((e) =>
             DateTime.parse(e.transactionDate ?? '').day == DateTime.now().day)
         .toList();
+    orders.sort((a, b) => DateTime.parse(b.transactionDate ?? '')
+        .compareTo(DateTime.parse(a.transactionDate ?? '')));
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -174,8 +177,7 @@ class OrderListView extends StatelessWidget {
         itemBuilder: (context, index) {
           final order = orders[index];
           return Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8.0),
             child: Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -209,10 +211,10 @@ class OrderListView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Order ID: ${order.id}',
+                            '${order.id}',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 8),
                           Text(
                             '${(order.items ?? []).length} items purchased',
                             style: Theme.of(context)
@@ -225,15 +227,53 @@ class OrderListView extends StatelessWidget {
                     ),
 
                     // 3. Transaction Status
-                    Text(
-                      order.status ?? '',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: order.status == 'Completed'
-                            ? Colors.green
-                            : Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          order.status ?? '',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: order.status == 'Completed'
+                                ? Colors.green
+                                : Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              DateFormat.MMMEd().format(
+                                  DateTime.parse(order.transactionDate ?? '')),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(fontSize: 12),
+                            ),
+                            Text(
+                              ',',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(fontSize: 12),
+                            ),
+                            const SizedBox(
+                              width: 3,
+                            ),
+                            Text(
+                              DateFormat.jmv().format(
+                                  DateTime.parse(order.transactionDate ?? '')),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -278,7 +318,7 @@ class ProductsListView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        (product.sku ?? '').substring(0, 2),
+                        (product.name ?? '').substring(0, 2),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -294,7 +334,7 @@ class ProductsListView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Product Id: ${product.sku}',
+                            ' ${product.name}',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],

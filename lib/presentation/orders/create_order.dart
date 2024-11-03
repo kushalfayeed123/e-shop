@@ -1,18 +1,22 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:eshop/core/domain/entities/cart.entity.dart';
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/core/domain/entities/transaction.entity.dart';
 import 'package:eshop/presentation/products/widgets/product_card.dart';
-import 'package:eshop/presentation/shared/app_button.dart';
-import 'package:eshop/presentation/shared/app_dialog.dart';
+import 'package:eshop/presentation/shared/constants.dart';
+import 'package:eshop/presentation/shared/widgets/app_button.dart';
+import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class CreateOrder extends ConsumerStatefulWidget {
   const CreateOrder({super.key});
@@ -24,6 +28,8 @@ class CreateOrder extends ConsumerStatefulWidget {
 class _CreateOrderState extends ConsumerState<CreateOrder> {
   List<Product> allProducts = [];
   List<Product> searchedProducts = [];
+  final MobileScannerController controller = MobileScannerController();
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -106,7 +112,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                       AppButton(
                         isActive: true,
                         background: Theme.of(context).colorScheme.primary,
-                        action: () => openScanner(),
+                        action: () => _openScanner(),
                         textColor: Colors.black,
                         text: 'Scan barcode',
                         hasBorder: false,
@@ -157,7 +163,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
+                      height: MediaQuery.of(context).size.height * 0.75,
                       child: SingleChildScrollView(
                           child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -246,28 +252,6 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                                     ),
                                   ),
                                 ),
-                                // AppButton(
-                                //   isActive: true,
-                                //   background: Colors.transparent,
-                                //   action: () {},
-                                //   textColor:
-                                //       Theme.of(context).colorScheme.primary,
-                                //   text: 'Cancel',
-                                //   hasBorder: true,
-                                //   elevation: 5,
-                                //   isFullWidth: false,
-                                // ),
-                                // AppButton(
-                                //   isActive: true,
-                                //   background:
-                                //       Theme.of(context).colorScheme.primary,
-                                //   action: () {},
-                                //   textColor: Colors.black,
-                                //   text: 'Confirm',
-                                //   hasBorder: false,
-                                //   elevation: 5,
-                                //   isFullWidth: false,
-                                // ),
                               ],
                             )
                           ],
@@ -286,10 +270,58 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     final sum = ((cartItems ?? []).map((e) => e.totalPrice))
         .reduce((a, b) => (a ?? 0) + (b ?? 0));
 
-    return sum.toString();
+    return '₦${oCcy.format(int.parse(sum.toString()))}';
   }
 
-  void openScanner() {}
+  double computeUnformatedTotal() {
+    final cartItems = ref.watch(transactionStateProvider).value?.cart;
+    final sum = ((cartItems ?? []).map((e) => e.totalPrice))
+        .reduce((a, b) => (a ?? 0) + (b ?? 0));
+
+    return (sum ?? 0).toDouble();
+  }
+
+  Future _openScanner() {
+    unawaited(controller.start());
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Container(
+          width: screenWidth * 0.5,
+          height: screenHeight * 0.6,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+          child: RotatedBox(
+            quarterTurns:
+                ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
+            child: MobileScanner(
+              controller: controller,
+              onDetect: (value) => _handleBarcode,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  _handleBarcode(BarcodeCapture barcode) async {
+    final scanResult = barcode.barcodes[0].rawValue ?? '';
+    final scannedProduct = allProducts.firstWhere(
+      (e) => e.sku == scanResult,
+      orElse: () => Product(),
+    );
+    if ((scannedProduct.category ?? '').isEmpty) {
+      AppDialog.showErrorDialog(context, 'Item not found');
+    } else {
+      await ref
+          .read(transactionStateProvider.notifier)
+          .addProductToCart(scannedProduct, '1');
+      context.pop();
+    }
+  }
 
   Widget _cartItem(Product? item) {
     String quantity = (ref.watch(transactionStateProvider).value?.cart ?? [])
@@ -301,8 +333,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
       height: 100,
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-          border: Border.all(color: Theme.of(context).colorScheme.primary),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12)),
       child: Center(
         child: Column(
@@ -320,6 +351,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   InkWell(
+                      radius: 40,
                       onTap: () {
                         if (count == 1) {
                           ref
@@ -332,14 +364,21 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                                   item ?? Product(), (count - 1).toString());
                         }
                       },
-                      child: const Text('-')),
+                      child: Image.asset(
+                        'assets/images/minus-circle.png',
+                        width: 25,
+                      )),
                   Text(count.toString()),
                   InkWell(
+                      radius: 40,
                       onTap: () {
                         ref.read(transactionStateProvider.notifier).updateCart(
                             item ?? Product(), (count + 1).toString());
                       },
-                      child: const Text('+'))
+                      child: Image.asset(
+                        'assets/images/add.png',
+                        width: 25,
+                      ))
                 ],
               ),
             )
@@ -359,7 +398,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
           items: (transactionState?.cart ?? [])
               .map((e) => e.item ?? Product())
               .toList(),
-          totalAmount: double.parse(computeTotal()),
+          totalAmount: computeUnformatedTotal(),
           transactionDate: DateTime.now().toString(),
           status: isCancel ? 'In progress' : 'Completed');
       await ref
