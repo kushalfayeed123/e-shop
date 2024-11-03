@@ -49,9 +49,12 @@ class TransactionService implements ITransactionService {
   Future<List<TransactionModel>> getTransactions() async {
     try {
       final snapshots = await _transactionDataCollectionReference.get();
-      return snapshots.docs
+      final res = snapshots.docs
           .map((e) => TransactionModel.fromJson(e.data(), e.id))
           .toList();
+      res.sort((a, b) => DateTime.parse(b.transactionDate ?? '')
+          .compareTo(DateTime.parse(a.transactionDate ?? '')));
+      return res;
     } on FirebaseException catch (e) {
       final message = e.message ?? '';
 
