@@ -60,9 +60,9 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (!controller.value.hasCameraPermission) {
-      return;
-    }
+    // if (!controller.value.hasCameraPermission) {
+    //   return;
+    // }
     _subscription = controller.barcodes.listen(_handleBarcode);
   }
 
