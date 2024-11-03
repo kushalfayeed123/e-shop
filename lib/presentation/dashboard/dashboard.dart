@@ -110,6 +110,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildOrderList() {
     final orders = ref.watch(transactionStateProvider).value?.orders ?? [];
+    final todayOrders = orders
+        .where((e) =>
+            DateTime.parse(e.transactionDate ?? '').day == DateTime.now().day)
+        .toList();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -125,7 +129,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           const SizedBox(
             height: 30,
           ),
-          OrderListView(orders: orders)
+          OrderListView(orders: todayOrders)
           // Add more widgets to build the order list
         ],
       ),

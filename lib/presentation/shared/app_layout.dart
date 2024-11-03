@@ -22,11 +22,11 @@ List<SideNavItem> sideNavItems = [
     icon: "products.png",
     isActive: false,
   ),
-  SideNavItem(
-    text: 'Settings',
-    icon: "settings.png",
-    isActive: false,
-  ),
+  // SideNavItem(
+  //   text: 'Settings',
+  //   icon: "settings.png",
+  //   isActive: false,
+  // ),
 ];
 
 class AppLayout extends ConsumerStatefulWidget {
