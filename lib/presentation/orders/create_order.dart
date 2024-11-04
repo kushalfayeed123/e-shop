@@ -210,7 +210,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 InkWell(
-                                  onTap: () => createOrder(true),
+                                  onTap: () => showCancelConfirmation(),
                                   child: Container(
                                     height: 45,
                                     width: 80,
@@ -398,6 +398,17 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
         ),
       ),
     );
+  }
+
+  void showCancelConfirmation() {
+    AppDialog.showConfirmationDialog(context,
+        info:
+            'Would you like to save this order for a later time or discard order?',
+        title: 'Cancel Order',
+        confirmAction: () => createOrder(true),
+        confirmActionText: 'Save',
+        denyAction: () => context.pop(),
+        denyActionText: 'Discard');
   }
 
   void createOrder(bool isCancel) async {

@@ -43,6 +43,10 @@ class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
 
   _handleBarcode(value) {
     widget.onScanned(value);
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+    controller.dispose();
   }
 
   @override

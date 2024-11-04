@@ -228,8 +228,15 @@ class AppDialog {
             ));
   }
 
-  static Future showInfoDialog(BuildContext context, String info, String title,
-      Function dialogAction, String dialogActionText) async {
+  static Future showConfirmationDialog(
+    BuildContext context, {
+    String? info,
+    String? title,
+    Function? confirmAction,
+    String? confirmActionText,
+    Function? denyAction,
+    String? denyActionText,
+  }) async {
     showDialog(
         barrierDismissible: false,
         useRootNavigator: true,
@@ -251,7 +258,7 @@ class AppDialog {
                   height: 74,
                 ),
                 title: Text(
-                  title,
+                  title ?? '',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontSize: 30,
@@ -261,7 +268,7 @@ class AppDialog {
                   width: ResponsiveBreakpoints.of(context).largerThan(MOBILE)
                       ? MediaQuery.of(context).size.width * 0.4
                       : MediaQuery.of(context).size.width,
-                  child: Text(info,
+                  child: Text(info ?? '',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
@@ -279,29 +286,29 @@ class AppDialog {
                       children: [
                         AppButton(
                             isActive: true,
-                            background: Colors.black,
+                            background: Colors.transparent,
                             action: () {
-                              context.pop();
+                              denyAction!();
                             },
                             textColor: Theme.of(context).colorScheme.primary,
-                            text: 'Close',
+                            text: denyActionText ?? '',
                             hasBorder: true,
                             isFullWidth: false,
                             elevation: 10),
                         const SizedBox(
                           width: 10,
                         ),
-                        dialogActionText.isNotEmpty
+                        (confirmActionText ?? '').isNotEmpty
                             ? AppButton(
                                 isActive: true,
                                 background:
                                     Theme.of(context).colorScheme.primary,
                                 isFullWidth: false,
                                 action: () {
-                                  dialogAction();
+                                  confirmAction!();
                                 },
                                 textColor: Colors.black,
-                                text: dialogActionText,
+                                text: confirmActionText ?? '',
                                 hasBorder: false,
                                 elevation: 0)
                             : const SizedBox.shrink()

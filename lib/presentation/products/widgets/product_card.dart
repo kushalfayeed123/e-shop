@@ -34,7 +34,7 @@ class _ProductCardState extends ConsumerState<ProductCard> {
       onTap: () =>
           widget.createOrder ? addProductToCartAction() : openEditProductPage(),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.only(bottom: 10),
         width: MediaQuery.of(context).size.width * 0.3,
         decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.secondary,
@@ -48,7 +48,7 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                   child: Image.file(
                 File(widget.product.image ?? ''),
                 fit: BoxFit.cover,
-                height: 50,
+                height: 70,
                 width: MediaQuery.of(context).size.width * 0.8,
               )),
               const SizedBox(
