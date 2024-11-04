@@ -348,7 +348,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     String quantity = (ref.watch(transactionStateProvider).value?.cart ?? [])
             .firstWhere((e) => e.item == item, orElse: () => CartProduct())
             .quantity ??
-        '';
+        '0';
     int count = int.parse(quantity);
     return Container(
       height: 100,

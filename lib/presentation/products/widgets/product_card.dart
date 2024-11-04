@@ -10,7 +10,7 @@ import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductCard extends ConsumerWidget {
+class ProductCard extends ConsumerStatefulWidget {
   final Product product;
   final bool createOrder;
 
@@ -21,13 +21,17 @@ class ProductCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends ConsumerState<ProductCard> {
+  @override
+  Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return InkWell(
-      onTap: () => createOrder
-          ? addProductToCartAction(context, ref)
-          : openEditProductPage(context, ref),
+      onTap: () =>
+          widget.createOrder ? addProductToCartAction() : openEditProductPage(),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         width: MediaQuery.of(context).size.width * 0.3,
@@ -41,7 +45,7 @@ class ProductCard extends ConsumerWidget {
             children: [
               Expanded(
                 child: CachedNetworkImage(
-                  imageUrl: product.image ?? '',
+                  imageUrl: widget.product.image ?? '',
                   fit: BoxFit.cover,
                   height: 50,
                   width: MediaQuery.of(context).size.width * 0.8,
@@ -73,7 +77,7 @@ class ProductCard extends ConsumerWidget {
                         SizedBox(
                           width: screenWidth * 0.1,
                           child: Text(
-                            product.name ?? '',
+                            widget.product.name ?? '',
                             overflow: TextOverflow.fade,
                             textAlign: TextAlign.end,
                             style: Theme.of(context).textTheme.bodySmall,
@@ -94,7 +98,7 @@ class ProductCard extends ConsumerWidget {
                         SizedBox(
                           width: screenWidth * 0.1,
                           child: Text(
-                            '₦${oCcy.format(double.parse(product.sellingPrice ?? '0'))}',
+                            '₦${oCcy.format(double.parse(widget.product.sellingPrice ?? '0'))}',
                             overflow: TextOverflow.fade,
                             textAlign: TextAlign.end,
                             style: Theme.of(context).textTheme.bodySmall,
@@ -115,7 +119,7 @@ class ProductCard extends ConsumerWidget {
                         SizedBox(
                           width: screenWidth * 0.1,
                           child: Text(
-                            '${product.quantityOnHand ?? 0}',
+                            '${widget.product.quantityOnHand ?? 0}',
                             overflow: TextOverflow.fade,
                             textAlign: TextAlign.end,
                             style: Theme.of(context).textTheme.bodySmall,
@@ -133,18 +137,20 @@ class ProductCard extends ConsumerWidget {
     );
   }
 
-  Future addProductToCartAction(BuildContext context, WidgetRef ref) async {
+  Future addProductToCartAction() async {
     try {
       await ref
           .read(transactionStateProvider.notifier)
-          .addProductToCart(product, '1');
+          .addProductToCart(widget.product, '1');
     } catch (e) {
       AppDialog.showErrorDialog(context, e.toString());
     }
   }
 
-  Future openEditProductPage(BuildContext context, WidgetRef ref) async {
-    await ref.read(productStateProvider.notifier).getProduct(product.sku ?? '');
+  Future openEditProductPage() async {
+    await ref
+        .read(productStateProvider.notifier)
+        .getProduct(widget.product.sku ?? '');
     return showDialog(
       context: context,
       builder: (context) => const AddProductDialog(
