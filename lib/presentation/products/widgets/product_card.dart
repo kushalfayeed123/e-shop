@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/presentation/products/widgets/add_product_dialog.dart';
@@ -144,7 +146,6 @@ class ProductCard extends ConsumerWidget {
   Future openEditProductPage(BuildContext context, WidgetRef ref) async {
     await ref.read(productStateProvider.notifier).getProduct(product.sku ?? '');
     return showDialog(
-      // ignore: use_build_context_synchronously
       context: context,
       builder: (context) => const AddProductDialog(
         isEdit: true,

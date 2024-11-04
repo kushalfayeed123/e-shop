@@ -312,7 +312,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   }
 
   _handleBarcode(BarcodeCapture barcode) async {
-    if ((barcode.barcodes[0].displayValue ?? '').isNotEmpty) {
+    if ((barcode.barcodes[0].rawValue ?? '').isNotEmpty) {
       if (!barcodeScanned) {
         barcodeScanned = true;
         final scanResult = barcode.barcodes[0].rawValue ?? '';
