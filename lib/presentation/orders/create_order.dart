@@ -184,7 +184,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                                 )
                               ]
                             : (cartState ?? [])
-                                .map((e) => _cartItem(e.item))
+                                .map((e) => _cartItem(e.item ?? Product()))
                                 .toList(),
                       ))),
                   (cartState ?? []).isEmpty
@@ -269,7 +269,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   String computeTotal() {
     double sum = itemsTotal();
 
-    return '₦${oCcy.format(int.parse(sum.toString()))}';
+    return '₦${oCcy.format(double.parse(sum.toString()))}';
   }
 
   double itemsTotal() {
@@ -344,7 +344,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     }
   }
 
-  Widget _cartItem(Product? item) {
+  Widget _cartItem(Product item) {
     String quantity = (ref.watch(transactionStateProvider).value?.cart ?? [])
             .firstWhere((e) => e.item == item, orElse: () => CartProduct())
             .quantity ??
