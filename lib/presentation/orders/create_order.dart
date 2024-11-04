@@ -312,18 +312,20 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   }
 
   _handleBarcode(BarcodeCapture barcode) async {
-    if ((barcode.barcodes[0].rawValue ?? '').isNotEmpty) {
-      if (!barcodeScanned) {
+    if (!barcodeScanned) {
+      AppDialog.showInfoDialog(context, barcode.barcodes[0].rawValue ?? '',
+          'Barcode value', () {}, 'Ok');
+      if ((barcode.barcodes[0].rawValue ?? '').isNotEmpty) {
         barcodeScanned = true;
         final scanResult = barcode.barcodes[0].rawValue ?? '';
         final scannedProduct = allProducts.firstWhere(
           (e) => e.sku == scanResult,
           orElse: () => Product(),
         );
-        if ((scannedProduct.category ?? '').isEmpty) {
-          AppDialog.showErrorDialog(context, 'Item not found');
-        } else {
+        if ((scannedProduct.sku != null)) {
           await addToCartAction(scannedProduct);
+        } else {
+          AppDialog.showErrorDialog(context, 'Item not found');
         }
       } else {
         barcodeScanned = false;
