@@ -30,6 +30,18 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
     return formatedDate;
   }
 
+  Future _handleRefresh() async {
+    try {
+      await ref.read(transactionStateProvider.notifier).getTransactions();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to refresh: $e'),
+        ));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final orderState = ref.watch(transactionStateProvider).value;
@@ -99,20 +111,24 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
             const SizedBox(height: 20),
             // Order Cards
             Expanded(
-                child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                child: RefreshIndicator(
+              onRefresh: _handleRefresh,
+              child: GridView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: (orders ?? []).length,
+                itemBuilder: (context, index) {
+                  // final order = searchedProducts.isEmpty
+                  //     ? allProducts[index]
+                  //     : searchedProducts[index];
+                  final order = (orders ?? [])[index];
+                  return _buildOrderCard(order);
+                },
               ),
-              itemCount: (orders ?? []).length,
-              itemBuilder: (context, index) {
-                // final order = searchedProducts.isEmpty
-                //     ? allProducts[index]
-                //     : searchedProducts[index];
-                final order = (orders ?? [])[index];
-                return _buildOrderCard(order);
-              },
             )),
           ],
         ),

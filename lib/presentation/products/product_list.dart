@@ -17,6 +17,18 @@ class _ProductListState extends ConsumerState<ProductList> {
   List<Product> allProducts = [];
   List<Product> searchedProducts = [];
 
+  Future _handleRefresh() async {
+    try {
+      await ref.read(productStateProvider.notifier).getProducts();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to refresh: $e'),
+        ));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -95,25 +107,28 @@ class _ProductListState extends ConsumerState<ProductList> {
                   ),
                 )
               : Expanded(
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
+                  child: RefreshIndicator(
+                    onRefresh: _handleRefresh,
+                    child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: searchedProducts.isEmpty
+                          ? allProducts.length
+                          : searchedProducts.length,
+                      itemBuilder: (context, index) {
+                        final product = searchedProducts.isEmpty
+                            ? allProducts[index]
+                            : searchedProducts[index];
+                        return ProductCard(
+                          product: product,
+                          createOrder: false,
+                        );
+                      },
                     ),
-                    itemCount: searchedProducts.isEmpty
-                        ? allProducts.length
-                        : searchedProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = searchedProducts.isEmpty
-                          ? allProducts[index]
-                          : searchedProducts[index];
-                      return ProductCard(
-                        product: product,
-                        createOrder: false,
-                      );
-                    },
                   ),
                 ),
         ],
