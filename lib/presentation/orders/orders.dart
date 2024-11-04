@@ -114,6 +114,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                 child: RefreshIndicator(
               onRefresh: _handleRefresh,
               child: GridView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 physics: const AlwaysScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
@@ -140,6 +141,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
     return Container(
       constraints:
           BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.3),
+      height: MediaQuery.of(context).size.height * 0.4,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
