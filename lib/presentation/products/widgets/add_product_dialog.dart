@@ -282,7 +282,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
           sellingPrice: _sellingPriceController.text,
           quantityOnHand: _quantityController.text,
           quantityReserved: _quantityController.text,
-          image: (widget.isEdit && image != null)
+          image: (widget.isEdit && image == null)
               ? product?.image
               : image?.path ?? '',
           status: widget.isEdit ? product?.status ?? '' : 'Active',

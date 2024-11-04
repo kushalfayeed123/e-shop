@@ -44,13 +44,14 @@ class _ProductCardState extends ConsumerState<ProductCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                  child: Image.file(
-                File(widget.product.image ?? ''),
-                fit: BoxFit.cover,
-                height: 70,
-                width: MediaQuery.of(context).size.width * 0.8,
-              )),
+              Expanded(child: SizedBox()
+                  // Image.file(
+                  //   File(widget.product.image ?? ''),
+                  //   fit: BoxFit.cover,
+                  //   height: 70,
+                  //   width: MediaQuery.of(context).size.width * 0.8,
+                  // ),
+                  ),
               const SizedBox(
                 height: 10,
               ),

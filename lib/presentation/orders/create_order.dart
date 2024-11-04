@@ -16,6 +16,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class CreateOrder extends ConsumerStatefulWidget {
@@ -36,7 +37,11 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     final screenWidth = MediaQuery.of(context).size.width;
     final state = ref.watch(productStateProvider).value;
     final cartState = ref.watch(transactionStateProvider).value?.cart;
+    final currentOrder =
+        ref.watch(transactionStateProvider).value?.currentOrder;
     allProducts = state?.products ?? [];
+    final formatedDate = DateFormat.yMMMEd().format(DateTime.now());
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
@@ -57,7 +62,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                       Row(
                         children: [
                           InkWell(
-                            onTap: () => context.pop(),
+                            onTap: () => clearOrder(),
                             child: Icon(
                               Icons.arrow_back_rounded,
                               size: 25,
@@ -67,19 +72,21 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                           const SizedBox(
                             width: 20,
                           ),
-                          const Text(
-                            "New Order",
-                            style: TextStyle(
+                          Text(
+                            (cartState ?? []).isNotEmpty
+                                ? (currentOrder?.id ?? '')
+                                : "New Order",
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
-                      const Text(
-                        "Wednesday, 12 July 2023",
-                        style:
-                            TextStyle(color: Color(0xFFB3B3B3), fontSize: 14),
+                      Text(
+                        formatedDate,
+                        style: const TextStyle(
+                            color: Color(0xFFB3B3B3), fontSize: 14),
                       ),
                     ],
                   ),
@@ -93,7 +100,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: TextFormField(
                           style: Theme.of(context).textTheme.bodySmall,
-                          onChanged: (value) => {},
+                          onChanged: (value) => searchProducts(value),
                           decoration: InputDecoration(
                             suffixIcon: const Icon(Icons.search_rounded),
                             labelText: 'Enter product name or product Id',
@@ -210,7 +217,8 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 InkWell(
-                                  onTap: () => showCancelConfirmation(),
+                                  onTap: () =>
+                                      showConfirmation(action: 'cancel'),
                                   child: Container(
                                     height: 45,
                                     width: 80,
@@ -231,7 +239,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                                   ),
                                 ),
                                 InkWell(
-                                  onTap: () => createOrder(false),
+                                  onTap: () => showConfirmation(action: 'save'),
                                   child: Container(
                                     height: 45,
                                     width: 80,
@@ -243,7 +251,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                                         border: Border.all()),
                                     child: Center(
                                       child: Text(
-                                        'Confirm',
+                                        'Save',
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodySmall!
@@ -326,7 +334,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
             .addProductToCart(scannedProduct, '1');
         barcodeScanned = true;
         setState(() {});
-        Navigator.of(context).pop();
+        // Navigator.of(context).pop();
       } else {
         AppDialog.showErrorDialog(context, 'Item not found');
       }
@@ -400,15 +408,37 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     );
   }
 
-  void showCancelConfirmation() {
+  void searchProducts(String param) {
+    if (param.isEmpty) {
+      searchedProducts = [];
+    } else {
+      searchedProducts = allProducts
+          .where((e) =>
+              (e.name ?? '').toLowerCase().contains(param.toLowerCase()) ||
+              (e.sku ?? '').toLowerCase().contains(param.toLowerCase()))
+          .toList();
+    }
+    setState(() {});
+  }
+
+  void showConfirmation({required String action}) {
     AppDialog.showConfirmationDialog(context,
-        info:
-            'Would you like to save this order for a later time or discard order?',
-        title: 'Cancel Order',
-        confirmAction: () => createOrder(true),
-        confirmActionText: 'Save',
-        denyAction: () => context.pop(),
-        denyActionText: 'Discard');
+        info: action == 'cancel'
+            ? 'This action will clear your current order. Are you sure you want to continue?'
+            : 'Would you like to complete this order or pause it. Ensure payment has been confirmed before completing the order',
+        title: action == 'cancel' ? 'Cancel Order' : 'Confirm Payment',
+        confirmAction: () =>
+            action == 'cancel' ? clearOrder() : createOrder(false),
+        confirmActionText: action == 'cancel' ? 'Continue' : 'Complete',
+        denyAction: () =>
+            action == 'cancel' ? context.pop() : createOrder(true),
+        denyActionText: action == 'cancel' ? 'Cancel' : 'Pause');
+  }
+
+  void clearOrder() {
+    ref.read(transactionStateProvider.notifier).clearOrderState();
+    context.pop();
+    context.pop();
   }
 
   void createOrder(bool isCancel) async {
@@ -416,18 +446,27 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
       AppDialog.showLoading(context);
       final transactionState = ref.watch(transactionStateProvider).value;
       final payload = TransactionModel(
+          id: transactionState?.currentOrder?.id ?? '',
           userId: FirebaseAuth.instance.currentUser?.uid,
           transactionType: 'Purchase',
           items: (transactionState?.cart ?? []).toList(),
           totalAmount: itemsTotal().toString(),
           transactionDate: DateTime.now().toString(),
           status: isCancel ? 'In progress' : 'Completed');
-      await ref
-          .read(transactionStateProvider.notifier)
-          .createTransaction(payload);
+
+      if (transactionState?.currentOrder != null) {
+        await ref
+            .read(transactionStateProvider.notifier)
+            .updateTransaction(payload);
+      } else {
+        await ref
+            .read(transactionStateProvider.notifier)
+            .createTransaction(payload);
+      }
       AppDialog.hideLoading(context);
       AppDialog.showSuccessDialog(
           context, 'Order has been registered successfully', action: () {
+        context.pop();
         context.pop();
         context.pop();
       });

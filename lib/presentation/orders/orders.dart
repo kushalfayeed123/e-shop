@@ -1,3 +1,5 @@
+import 'package:eshop/core/domain/entities/cart.entity.dart';
+import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/core/domain/entities/transaction.entity.dart';
 import 'package:eshop/presentation/shared/constants.dart';
 import 'package:eshop/presentation/shared/widgets/app_button.dart';
@@ -46,7 +48,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   Widget build(BuildContext context) {
     final orderState = ref.watch(transactionStateProvider).value;
     final orders = orderState?.orders;
-    final screenWidth = MediaQuery.of(context).size.width;
     final formatedDate = DateFormat.yMMMEd().format(DateTime.now());
 
     return Scaffold(
@@ -76,27 +77,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
             const SizedBox(height: 20),
             // Order Filters
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  width: screenWidth * 0.3,
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: TextFormField(
-                    style: Theme.of(context).textTheme.bodySmall,
-                    onChanged: (value) => {},
-                    decoration: InputDecoration(
-                      suffixIcon: const Icon(Icons.search_rounded),
-                      labelText: 'Search Orders',
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.tertiary)),
-                      labelStyle: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
                 AppButton(
                   isActive: true,
                   background: Theme.of(context).colorScheme.primary,
@@ -136,192 +118,215 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
     );
   }
 
+  deleteOrder(TransactionModel order) {}
+
+  viewOrder(TransactionModel order) async {
+    if (order.status == 'In progress') {
+      final itemsInCart = order.items;
+      for (CartProduct item in (itemsInCart ?? [])) {
+        await ref
+            .read(transactionStateProvider.notifier)
+            .addProductToCart(item.item ?? Product(), item.quantity ?? '');
+        await ref
+            .read(transactionStateProvider.notifier)
+            .getTransaction(order.id ?? '');
+      }
+      if (mounted) {
+        context.push('/newOrder');
+      }
+    }
+  }
+
   Widget _buildOrderCard(TransactionModel order) {
-    return Container(
-      constraints:
-          BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.3),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 120,
-                child: Text('${order.id}',
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium),
-              ),
-              Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: (order.status ?? '').toLowerCase() == 'completed'
-                        ? Colors.greenAccent.withOpacity(0.7)
-                        : Theme.of(context).colorScheme.primary),
-                child: Center(
-                    child: Text(
-                  order.status ?? '',
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+    return InkWell(
+      onLongPress: () => deleteOrder(order),
+      onTap: () => viewOrder(order),
+      child: Container(
+        constraints:
+            BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.3),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondary,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: Text('${order.id}',
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
                       color: (order.status ?? '').toLowerCase() == 'completed'
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 12),
-                )),
-              )
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(getFormattedDate(order.transactionDate ?? ''),
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall!
-                      .copyWith(fontSize: 12)),
-              Text(getFormattedTime(order.transactionDate ?? ''),
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall!
-                      .copyWith(fontSize: 12)),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Divider(
-            indent: 5,
-            endIndent: 5,
-            color: Theme.of(context).colorScheme.primary,
-            thickness: 0.3,
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: 100,
-                        child: Text(
-                          'items',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(fontSize: 10, color: Colors.white24),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 50,
-                        child: Text(
-                          'Qty',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(fontSize: 10, color: Colors.white24),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 50,
-                        child: Text(
-                          'Price',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(fontSize: 10, color: Colors.white24),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  ...(order.items ?? []).map(
-                    (e) => Column(
+                          ? Colors.greenAccent.withOpacity(0.7)
+                          : Theme.of(context).colorScheme.primary),
+                  child: Center(
+                      child: Text(
+                    order.status ?? '',
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: (order.status ?? '').toLowerCase() == 'completed'
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 12),
+                  )),
+                )
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(getFormattedDate(order.transactionDate ?? ''),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(fontSize: 12)),
+                Text(getFormattedTime(order.transactionDate ?? ''),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(fontSize: 12)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Divider(
+              indent: 5,
+              endIndent: 5,
+              color: Theme.of(context).colorScheme.primary,
+              thickness: 0.3,
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              child: Text(
-                                e.item?.name ?? '',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      fontSize: 10,
-                                    ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 50,
-                              child: Text(
-                                e.quantity ?? '',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      fontSize: 10,
-                                    ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 50,
-                              child: Text(
-                                '₦${oCcy.format(double.parse(e.item?.sellingPrice ?? '0') * double.parse(e.quantity ?? '0'))}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      fontSize: 10,
-                                    ),
-                              ),
-                            ),
-                          ],
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            'items',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(fontSize: 10, color: Colors.white24),
+                          ),
                         ),
-                        const SizedBox(
-                          height: 12,
+                        SizedBox(
+                          width: 50,
+                          child: Text(
+                            'Qty',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(fontSize: 10, color: Colors.white24),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 50,
+                          child: Text(
+                            'Price',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(fontSize: 10, color: Colors.white24),
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    ...(order.items ?? []).map(
+                      (e) => Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: 100,
+                                child: Text(
+                                  e.item?.name ?? '',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        fontSize: 10,
+                                      ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 50,
+                                child: Text(
+                                  e.quantity ?? '',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        fontSize: 10,
+                                      ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 50,
+                                child: Text(
+                                  '₦${oCcy.format(double.parse(e.item?.sellingPrice ?? '0') * double.parse(e.quantity ?? '0'))}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        fontSize: 10,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Divider(
-            indent: 5,
-            endIndent: 5,
-            color: Theme.of(context).colorScheme.primary,
-            thickness: 0.3,
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total',
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      fontSize: 12,
-                    ),
-              ),
-              Text(
-                '₦${oCcy.format(double.parse(order.totalAmount ?? ''))}',
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      fontSize: 12,
-                    ),
-              ),
-            ],
-          )
-        ],
+            const SizedBox(height: 10),
+            Divider(
+              indent: 5,
+              endIndent: 5,
+              color: Theme.of(context).colorScheme.primary,
+              thickness: 0.3,
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total',
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        fontSize: 12,
+                      ),
+                ),
+                Text(
+                  '₦${oCcy.format(double.parse(order.totalAmount ?? ''))}',
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        fontSize: 12,
+                      ),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

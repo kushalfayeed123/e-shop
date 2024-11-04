@@ -58,6 +58,16 @@ class TransactionState extends _$TransactionState {
     }
   }
 
+  void clearOrderState() {
+    final currentState = state.asData?.value;
+
+    final newState = TransactionStateModel(
+        orders: currentState?.orders,
+        currentOrder: currentState?.currentOrder,
+        cart: []);
+    setState(newState);
+  }
+
   Future<void> getTransactions() async {
     try {
       final currentState = state.asData?.value;
@@ -101,6 +111,8 @@ class TransactionState extends _$TransactionState {
     try {
       final currentState = state.asData?.value;
       List<CartProduct> payload = currentState?.cart ?? [];
+      payload = payload.toSet().toList();
+
       if ((payload.map((e) => e.item)).contains(product)) {
         return;
       } else {
