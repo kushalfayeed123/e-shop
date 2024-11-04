@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/presentation/products/widgets/add_product_dialog.dart';
 import 'package:eshop/presentation/shared/constants.dart';
@@ -44,20 +45,12 @@ class _ProductCardState extends ConsumerState<ProductCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: CachedNetworkImage(
-                  imageUrl: widget.product.image ?? '',
-                  fit: BoxFit.cover,
-                  height: 50,
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      SizedBox(
-                    width: 20,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, value: downloadProgress.progress),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
-              ),
+                  child: Image.file(
+                File(widget.product.image ?? ''),
+                fit: BoxFit.cover,
+                height: 50,
+                width: MediaQuery.of(context).size.width * 0.8,
+              )),
               const SizedBox(
                 height: 10,
               ),

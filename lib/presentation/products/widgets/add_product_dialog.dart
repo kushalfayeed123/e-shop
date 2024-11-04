@@ -8,8 +8,7 @@ import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/presentation/shared/widgets/scanner.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -53,7 +52,6 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   int? reorderQuantity;
   String? status;
   File? image;
-  String downloadLink = '';
   bool barcodeScanned = false;
 
   @override
@@ -67,7 +65,6 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
       _categoryController.text = product?.category ?? '';
       _costPriceController.text = product?.costPrice ?? '';
       _sellingPriceController.text = product?.sellingPrice ?? '';
-      downloadLink = product?.image ?? '';
       image = File(product?.image ?? '');
     }
     setState(() {});
@@ -125,9 +122,9 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
                         color: const Color.fromARGB(255, 53, 56, 58),
                         borderRadius: BorderRadius.circular(5)),
                     child: Center(
-                      child: downloadLink.isNotEmpty
-                          ? Image.network(
-                              image?.path ?? '',
+                      child: image != null
+                          ? Image.file(
+                              image ?? File(''),
                               fit: BoxFit.contain,
                             )
                           : Column(
@@ -285,9 +282,9 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
           sellingPrice: _sellingPriceController.text,
           quantityOnHand: _quantityController.text,
           quantityReserved: _quantityController.text,
-          image: (widget.isEdit && (downloadLink).isEmpty)
+          image: (widget.isEdit && image != null)
               ? product?.image
-              : downloadLink,
+              : image?.path ?? '',
           status: widget.isEdit ? product?.status ?? '' : 'Active',
           createdAt: widget.isEdit
               ? (product?.createdAt ?? '')
@@ -359,17 +356,6 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
       final ImagePicker picker = ImagePicker();
       final xImage = await picker.pickImage(source: ImageSource.gallery);
       image = File(xImage?.path ?? '');
-
-      final ref = FirebaseStorage.instanceFor(
-              bucket: "gs://grocery-app-ea4b9.appspot.com")
-          .ref();
-      if (kIsWeb) {
-        await ref.putData((image ?? File('')).readAsBytesSync());
-      } else {
-        await ref.putFile(File(image?.path ?? ''));
-      }
-
-      downloadLink = await ref.getDownloadURL();
 
       setState(() {});
     } catch (e) {
