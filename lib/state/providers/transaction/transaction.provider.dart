@@ -111,8 +111,8 @@ class TransactionState extends _$TransactionState {
           currentOrder: currentState?.currentOrder,
           cart: payload,
         );
-        setState(updatedStateSlice);
-        updateCart(product, quantity);
+        await setState(updatedStateSlice);
+        await updateCart(product, quantity);
       }
     } catch (e) {
       rethrow;

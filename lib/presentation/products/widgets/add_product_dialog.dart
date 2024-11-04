@@ -334,7 +334,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   }
 
   _handleBarcode(BarcodeCapture barcode) {
-    if ((barcode.barcodes[0].displayValue ?? '').isNotEmpty) {
+    if ((barcode.barcodes[0].rawValue ?? '').isNotEmpty) {
       if (!barcodeScanned) {
         barcodeScanned = true;
         _idController.text = barcode.barcodes[0].rawValue ?? '';

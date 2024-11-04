@@ -94,7 +94,7 @@ class ProductCard extends ConsumerWidget {
                         SizedBox(
                           width: screenWidth * 0.1,
                           child: Text(
-                            '₦${oCcy.format(int.parse(product.sellingPrice ?? '0'))}',
+                            '₦${oCcy.format(double.parse(product.sellingPrice ?? '0'))}',
                             overflow: TextOverflow.fade,
                             textAlign: TextAlign.end,
                             style: Theme.of(context).textTheme.bodySmall,
