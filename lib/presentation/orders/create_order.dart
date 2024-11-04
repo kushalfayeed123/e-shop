@@ -9,6 +9,7 @@ import 'package:eshop/presentation/products/widgets/product_card.dart';
 import 'package:eshop/presentation/shared/constants.dart';
 import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
+import 'package:eshop/presentation/shared/widgets/scanner.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 
 class CreateOrder extends ConsumerStatefulWidget {
   const CreateOrder({super.key});
@@ -28,7 +28,6 @@ class CreateOrder extends ConsumerStatefulWidget {
 class _CreateOrderState extends ConsumerState<CreateOrder> {
   List<Product> allProducts = [];
   List<Product> searchedProducts = [];
-  final MobileScannerController controller = MobileScannerController();
   bool barcodeScanned = false;
 
   @override
@@ -286,8 +285,6 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   }
 
   Future _openScanner() {
-    unawaited(controller.start());
-
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -298,49 +295,41 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
           width: screenWidth * 0.5,
           height: screenHeight * 0.6,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
-          child: RotatedBox(
-            quarterTurns:
-                ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
-            child: MobileScanner(
-              controller: controller,
-              onDetect: (value) => _handleBarcode,
-            ),
+          child: Scanner(
+            onScanned: (BarcodeCapture value) async {
+              if ((value.barcodes[0].displayValue ?? '').isNotEmpty) {
+                if (barcodeScanned == false) {
+                  await _handleBarcode(value, context);
+                }
+              } else {
+                barcodeScanned = false;
+                AppDialog.showErrorDialog(context, 'Code is invalid');
+              }
+            },
           ),
         ),
       ),
     );
   }
 
-  _handleBarcode(BarcodeCapture barcode) async {
-    AppDialog.showInfoDialog(context, barcode.barcodes[0].rawValue ?? '',
-        'Barcode value', () {}, 'Ok');
-    if (!barcodeScanned) {
-      if ((barcode.barcodes[0].rawValue ?? '').isNotEmpty) {
-        barcodeScanned = true;
-        final scanResult = barcode.barcodes[0].rawValue ?? '';
-        final scannedProduct = allProducts.firstWhere(
-          (e) => e.sku == scanResult,
-          orElse: () => Product(),
-        );
-        if ((scannedProduct.sku != null)) {
-          await addToCartAction(scannedProduct);
-        } else {
-          AppDialog.showErrorDialog(context, 'Item not found');
-        }
-      } else {
-        barcodeScanned = false;
-        const error = 'Code is invalid';
-        AppDialog.showErrorDialog(context, error);
-      }
-    }
-  }
-
-  Future<void> addToCartAction(Product scannedProduct) async {
+  Future<void> _handleBarcode(
+      BarcodeCapture barcode, BuildContext context) async {
     try {
-      await ref
-          .read(transactionStateProvider.notifier)
-          .addProductToCart(scannedProduct, '1');
-      context.pop();
+      final scanResult = barcode.barcodes[0].rawValue ?? '';
+      final scannedProduct = allProducts.firstWhere(
+        (e) => e.sku == scanResult,
+        orElse: () => Product(),
+      );
+      if ((scannedProduct.sku != null)) {
+        await ref
+            .read(transactionStateProvider.notifier)
+            .addProductToCart(scannedProduct, '1');
+        barcodeScanned = true;
+        setState(() {});
+        Navigator.of(context).pop();
+      } else {
+        AppDialog.showErrorDialog(context, 'Item not found');
+      }
     } catch (e) {
       AppDialog.showErrorDialog(context, e.toString());
     }
@@ -363,7 +352,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(item?.name ?? ''),
+            Text(item.name ?? ''),
             const SizedBox(
               height: 20,
             ),
@@ -379,12 +368,11 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                         if (count == 1) {
                           ref
                               .read(transactionStateProvider.notifier)
-                              .removeItemFromCart(item ?? Product());
+                              .removeItemFromCart(item);
                         } else {
                           ref
                               .read(transactionStateProvider.notifier)
-                              .updateCart(item ?? Product(),
-                                  (count - 1).toString(), false);
+                              .updateCart(item, (count - 1).toString(), false);
                         }
                       },
                       child: Image.asset(
@@ -395,8 +383,9 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                   InkWell(
                       radius: 40,
                       onTap: () {
-                        ref.read(transactionStateProvider.notifier).updateCart(
-                            item ?? Product(), (count + 1).toString(), false);
+                        ref
+                            .read(transactionStateProvider.notifier)
+                            .updateCart(item, (count + 1).toString(), false);
                       },
                       child: Image.asset(
                         'assets/images/add.png',

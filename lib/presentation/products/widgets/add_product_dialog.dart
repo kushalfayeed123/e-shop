@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
+import 'package:eshop/presentation/shared/widgets/scanner.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -14,7 +15,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:uuid/uuid.dart';
 
 class AddProductDialog extends ConsumerStatefulWidget
@@ -28,7 +28,6 @@ class AddProductDialog extends ConsumerStatefulWidget
 
 class AddProductDialogState extends ConsumerState<AddProductDialog> {
   final _formKey = GlobalKey<FormState>();
-  final MobileScannerController controller = MobileScannerController();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -58,16 +57,6 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   bool barcodeScanned = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    // if (!controller.value.hasCameraPermission) {
-    //   return;
-    // }
-    _subscription = controller.barcodes.listen(_handleBarcode);
-  }
-
-  @override
   void initState() {
     super.initState();
     if (widget.isEdit) {
@@ -88,8 +77,6 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   void dispose() async {
     unawaited(_subscription?.cancel());
     _subscription = null;
-    super.dispose();
-    await controller.dispose();
     super.dispose();
   }
 
@@ -333,24 +320,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
     }
   }
 
-  _handleBarcode(BarcodeCapture barcode) {
-    if ((barcode.barcodes[0].rawValue ?? '').isNotEmpty) {
-      if (!barcodeScanned) {
-        barcodeScanned = true;
-        _idController.text = barcode.barcodes[0].rawValue ?? '';
-        setState(() {});
-        context.pop();
-      }
-    } else {
-      barcodeScanned = false;
-      const error = 'Code is invalid';
-      AppDialog.showErrorDialog(context, error);
-    }
-  }
-
   Future _openScanner() {
-    unawaited(controller.start());
-
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -358,20 +328,30 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
       context: context,
       builder: (context) => Dialog(
         child: Container(
-          width: screenWidth * 0.5,
-          height: screenHeight * 0.6,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
-          child: RotatedBox(
-            quarterTurns:
-                ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
-            child: MobileScanner(
-              controller: controller,
-              onDetect: (value) => _handleBarcode,
-            ),
-          ),
-        ),
+            width: screenWidth * 0.5,
+            height: screenHeight * 0.6,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+            child: Scanner(
+              onScanned: (BarcodeCapture value) {
+                _handleScan(value, context);
+              },
+            )),
       ),
     );
+  }
+
+  void _handleScan(BarcodeCapture value, BuildContext context) {
+    if ((value.barcodes[0].displayValue ?? '').isNotEmpty) {
+      if (barcodeScanned == false) {
+        _idController.text = value.barcodes[0].rawValue ?? '';
+        barcodeScanned = true;
+        setState(() {});
+        Navigator.of(context).pop();
+      }
+    } else {
+      barcodeScanned = false;
+      AppDialog.showErrorDialog(context, 'Code is invalid');
+    }
   }
 
   void _pickImage() async {
