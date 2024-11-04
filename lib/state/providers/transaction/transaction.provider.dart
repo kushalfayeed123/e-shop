@@ -99,30 +99,28 @@ class TransactionState extends _$TransactionState {
 
   Future<void> addProductToCart(Product product, String quantity) async {
     try {
-      final cartProduct = CartProduct(item: product, quantity: quantity);
       final currentState = state.asData?.value;
       List<CartProduct> payload = currentState?.cart ?? [];
       if ((payload.map((e) => e.item)).contains(product)) {
         return;
       } else {
-        payload = [...payload, cartProduct];
-        final updatedStateSlice = TransactionStateModel(
-          orders: currentState?.orders,
-          currentOrder: currentState?.currentOrder,
-          cart: payload,
-        );
-        await setState(updatedStateSlice);
-        await updateCart(product, quantity);
+        // await setState(updatedStateSlice);
+        await updateCart(product, quantity, true);
       }
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> updateCart(Product product, String quantity) async {
+  Future<void> updateCart(
+      Product product, String quantity, bool isCreate) async {
     try {
       final currentState = state.asData?.value;
       List<CartProduct> payload = currentState?.cart ?? [];
+      if (isCreate) {
+        final cartProduct = CartProduct(item: product, quantity: quantity);
+        payload = [...payload, cartProduct];
+      }
       final newProduct = payload.firstWhere(
         (e) => e.item?.sku == product.sku,
         orElse: () => CartProduct(),

@@ -26,7 +26,7 @@ class ProductCard extends ConsumerWidget {
 
     return InkWell(
       onTap: () => createOrder
-          ? addProductToCart(context, ref)
+          ? addProductToCartAction(context, ref)
           : openEditProductPage(context, ref),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -133,7 +133,7 @@ class ProductCard extends ConsumerWidget {
     );
   }
 
-  Future addProductToCart(BuildContext context, WidgetRef ref) async {
+  Future addProductToCartAction(BuildContext context, WidgetRef ref) async {
     try {
       await ref
           .read(transactionStateProvider.notifier)

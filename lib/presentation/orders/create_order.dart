@@ -381,8 +381,8 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                         } else {
                           ref
                               .read(transactionStateProvider.notifier)
-                              .updateCart(
-                                  item ?? Product(), (count - 1).toString());
+                              .updateCart(item ?? Product(),
+                                  (count - 1).toString(), false);
                         }
                       },
                       child: Image.asset(
@@ -394,7 +394,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                       radius: 40,
                       onTap: () {
                         ref.read(transactionStateProvider.notifier).updateCart(
-                            item ?? Product(), (count + 1).toString());
+                            item ?? Product(), (count + 1).toString(), false);
                       },
                       child: Image.asset(
                         'assets/images/add.png',
