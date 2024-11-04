@@ -37,12 +37,12 @@ class TransactionState extends _$TransactionState {
           );
 
           product.item?.quantityOnHand =
-              (int.parse(product.item?.quantityOnHand ?? '0') -
-                      int.parse(productQuantity.quantity ?? '0'))
+              (double.parse(product.item?.quantityOnHand ?? '0') -
+                      double.parse(productQuantity.quantity ?? '0'))
                   .toString();
           product.item?.quantityReserved =
-              (int.parse(product.item?.quantityReserved ?? '0') -
-                      int.parse(productQuantity.quantity ?? '0'))
+              (double.parse(product.item?.quantityReserved ?? '0') -
+                      double.parse(productQuantity.quantity ?? '0'))
                   .toString();
           await _productService.updateProduct(product.item ?? Product());
         }
@@ -126,9 +126,10 @@ class TransactionState extends _$TransactionState {
         orElse: () => CartProduct(),
       );
       newProduct.quantity = quantity;
-      newProduct.totalPrice = (int.parse(newProduct.item?.sellingPrice ?? '0') *
-              int.parse(newProduct.quantity ?? '0'))
-          .toString();
+      newProduct.totalPrice =
+          (double.parse(newProduct.item?.sellingPrice ?? '0') *
+                  double.parse(newProduct.quantity ?? '0'))
+              .toString();
       payload = [...payload, newProduct];
       payload = payload.toSet().toList();
 
