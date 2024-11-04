@@ -29,6 +29,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   List<Product> allProducts = [];
   List<Product> searchedProducts = [];
   final MobileScannerController controller = MobileScannerController();
+  bool barcodeScanned = false;
 
   @override
   Widget build(BuildContext context) {
@@ -266,19 +267,22 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   }
 
   String computeTotal() {
-    final cartItems = ref.watch(transactionStateProvider).value?.cart;
-    final sum = ((cartItems ?? []).map((e) => e.totalPrice))
-        .reduce((a, b) => (a ?? 0) + (b ?? 0));
+    double sum = itemsTotal();
 
     return '₦${oCcy.format(int.parse(sum.toString()))}';
   }
 
-  double computeUnformatedTotal() {
+  double itemsTotal() {
     final cartItems = ref.watch(transactionStateProvider).value?.cart;
-    final sum = ((cartItems ?? []).map((e) => e.totalPrice))
-        .reduce((a, b) => (a ?? 0) + (b ?? 0));
+    final sum = ((cartItems ?? [])
+        .map((e) => double.parse(e.totalPrice ?? '0'))).reduce((a, b) => a + b);
+    return sum;
+  }
 
-    return (sum ?? 0).toDouble();
+  String computeUnformatedTotal() {
+    double sum = itemsTotal();
+
+    return sum.toDouble().toString();
   }
 
   Future _openScanner() {
@@ -308,18 +312,27 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   }
 
   _handleBarcode(BarcodeCapture barcode) async {
-    final scanResult = barcode.barcodes[0].rawValue ?? '';
-    final scannedProduct = allProducts.firstWhere(
-      (e) => e.sku == scanResult,
-      orElse: () => Product(),
-    );
-    if ((scannedProduct.category ?? '').isEmpty) {
-      AppDialog.showErrorDialog(context, 'Item not found');
-    } else {
-      await ref
-          .read(transactionStateProvider.notifier)
-          .addProductToCart(scannedProduct, '1');
-      context.pop();
+    if ((barcode.barcodes[0].displayValue ?? '').isNotEmpty) {
+      if (!barcodeScanned) {
+        barcodeScanned = true;
+        final scanResult = barcode.barcodes[0].rawValue ?? '';
+        final scannedProduct = allProducts.firstWhere(
+          (e) => e.sku == scanResult,
+          orElse: () => Product(),
+        );
+        if ((scannedProduct.category ?? '').isEmpty) {
+          AppDialog.showErrorDialog(context, 'Item not found');
+        } else {
+          await ref
+              .read(transactionStateProvider.notifier)
+              .addProductToCart(scannedProduct, '1');
+          context.pop();
+        }
+      } else {
+        barcodeScanned = false;
+        const error = 'Code is invalid';
+        AppDialog.showErrorDialog(context, error);
+      }
     }
   }
 
@@ -395,10 +408,8 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
       final payload = TransactionModel(
           userId: FirebaseAuth.instance.currentUser?.uid,
           transactionType: 'Purchase',
-          items: (transactionState?.cart ?? [])
-              .map((e) => e.item ?? Product())
-              .toList(),
-          totalAmount: computeUnformatedTotal(),
+          items: (transactionState?.cart ?? []).toList(),
+          totalAmount: itemsTotal().toString(),
           transactionDate: DateTime.now().toString(),
           status: isCancel ? 'In progress' : 'Completed');
       await ref

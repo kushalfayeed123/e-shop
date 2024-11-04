@@ -1,15 +1,15 @@
+import 'package:eshop/core/domain/entities/cart.entity.dart';
 import 'package:eshop/core/domain/entities/discount.entity.dart';
-import 'package:eshop/core/domain/entities/product.entity.dart';
 
 class TransactionModel {
   String? id;
   String? userId;
   String? customerId;
   String? transactionType;
-  List<Product>? items;
-  int? subtotal;
-  double? tax;
-  double? totalAmount;
+  List<CartProduct>? items;
+  String? subtotal;
+  String? tax;
+  String? totalAmount;
   String? paymentMethod;
   String? transactionDate;
   String? status;
@@ -38,9 +38,9 @@ class TransactionModel {
     customerId = json['customerId'];
     transactionType = json['transactionType'];
     if (json['items'] != null) {
-      items = <Product>[];
+      items = <CartProduct>[];
       json['items'].forEach((v) {
-        items!.add(Product.fromJson(v));
+        items!.add(CartProduct.fromJson(v));
       });
     }
     subtotal = json['subtotal'];

@@ -1,6 +1,7 @@
 import 'package:eshop/presentation/shared/models/side_nav_item.model.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
+import 'package:eshop/state/providers/user/user.provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,6 +56,7 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
 
   void fetchData(bool fetchLocation) async {
     try {
+      await ref.read(userStateProvider.notifier).getCurrentUser();
       await ref.read(productStateProvider.notifier).getProducts();
       await ref.read(transactionStateProvider.notifier).getTransactions();
     } catch (e) {
@@ -66,6 +68,7 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(userStateProvider);
     ref.watch(productStateProvider);
     ref.watch(transactionStateProvider);
     final screenHeight = MediaQuery.of(context).size.height;

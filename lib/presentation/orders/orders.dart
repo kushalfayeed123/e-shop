@@ -235,7 +235,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                             SizedBox(
                               width: 100,
                               child: Text(
-                                e.name ?? '',
+                                e.item?.name ?? '',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
@@ -247,7 +247,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                             SizedBox(
                               width: 50,
                               child: Text(
-                                '',
+                                e.quantity ?? '',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
@@ -259,7 +259,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                             SizedBox(
                               width: 50,
                               child: Text(
-                                '₦${oCcy.format(double.parse(e.sellingPrice ?? '0'))}',
+                                '₦${oCcy.format(double.parse(e.item?.sellingPrice ?? '0') * double.parse(e.quantity ?? '0'))}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
@@ -298,7 +298,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                     ),
               ),
               Text(
-                '₦${oCcy.format(order.totalAmount)}',
+                '₦${oCcy.format(double.parse(order.totalAmount ?? ''))}',
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       fontSize: 12,
                     ),

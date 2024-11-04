@@ -1,8 +1,8 @@
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/core/domain/entities/transaction.entity.dart';
-import 'package:eshop/presentation/shared/constants.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
+import 'package:eshop/state/providers/user/user.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -16,7 +16,28 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  String _computeGreeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return "Good morning! ";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good afternoon! ";
+    } else if (hour >= 17 && hour < 21) {
+      return "Good evening! ";
+    } else {
+      return "Good evening!";
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(userStateProvider).value?.currentUser;
+
     final formatedDate = DateFormat.yMMMEd().format(DateTime.now());
     final orderState = ref.watch(transactionStateProvider).value?.orders ?? [];
     final completedOrders =
@@ -31,12 +52,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Dashboard",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Text(
+                    _computeGreeting(),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    (userState?.name ?? ''),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               Text(
                 formatedDate,

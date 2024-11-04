@@ -30,20 +30,21 @@ class TransactionState extends _$TransactionState {
       final currentState = state.asData?.value;
       await _transactionService.createTransaction(payload);
       if ((payload.status ?? '').toLowerCase() == 'completed') {
-        for (Product product in (payload.items ?? [])) {
+        for (CartProduct product in (payload.items ?? [])) {
           final productQuantity = (currentState?.cart ?? []).firstWhere(
             (e) => e.item == product,
             orElse: () => CartProduct(),
           );
 
-          product.quantityOnHand = (int.parse(product.quantityOnHand ?? '0') -
-                  int.parse(productQuantity.quantity ?? '0'))
-              .toString();
-          product.quantityReserved =
-              (int.parse(product.quantityReserved ?? '0') -
+          product.item?.quantityOnHand =
+              (int.parse(product.item?.quantityOnHand ?? '0') -
                       int.parse(productQuantity.quantity ?? '0'))
                   .toString();
-          await _productService.updateProduct(product);
+          product.item?.quantityReserved =
+              (int.parse(product.item?.quantityReserved ?? '0') -
+                      int.parse(productQuantity.quantity ?? '0'))
+                  .toString();
+          await _productService.updateProduct(product.item ?? Product());
         }
       }
       final newState = TransactionStateModel(
@@ -123,8 +124,9 @@ class TransactionState extends _$TransactionState {
     );
     // payload.removeWhere((e) => e.item == newProduct.item);
     newProduct.quantity = quantity;
-    newProduct.totalPrice = int.parse(newProduct.item?.sellingPrice ?? '0') *
-        int.parse(newProduct.quantity ?? '0');
+    newProduct.totalPrice = (int.parse(newProduct.item?.sellingPrice ?? '0') *
+            int.parse(newProduct.quantity ?? '0'))
+        .toString();
     payload = [...payload, newProduct];
     payload = payload.toSet().toList();
 

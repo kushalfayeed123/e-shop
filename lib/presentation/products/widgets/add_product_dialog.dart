@@ -334,12 +334,18 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   }
 
   _handleBarcode(BarcodeCapture barcode) {
-    if (kDebugMode) {
-      print(barcode.barcodes[0].rawValue);
+    if ((barcode.barcodes[0].displayValue ?? '').isNotEmpty) {
+      if (!barcodeScanned) {
+        barcodeScanned = true;
+        _idController.text = barcode.barcodes[0].rawValue ?? '';
+        setState(() {});
+        context.pop();
+      }
+    } else {
+      barcodeScanned = false;
+      const error = 'Code is invalid';
+      AppDialog.showErrorDialog(context, error);
     }
-    _idController.text = barcode.barcodes[0].rawValue ?? '';
-    setState(() {});
-    context.pop();
   }
 
   Future _openScanner() {
