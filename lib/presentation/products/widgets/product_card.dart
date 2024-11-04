@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/presentation/products/widgets/add_product_dialog.dart';
 import 'package:eshop/presentation/shared/constants.dart';
+import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:flutter/material.dart';
@@ -131,9 +132,13 @@ class ProductCard extends ConsumerWidget {
   }
 
   Future addProductToCart(BuildContext context, WidgetRef ref) async {
-    await ref
-        .read(transactionStateProvider.notifier)
-        .addProductToCart(product, '1');
+    try {
+      await ref
+          .read(transactionStateProvider.notifier)
+          .addProductToCart(product, '1');
+    } catch (e) {
+      AppDialog.showErrorDialog(context, e.toString());
+    }
   }
 
   Future openEditProductPage(BuildContext context, WidgetRef ref) async {

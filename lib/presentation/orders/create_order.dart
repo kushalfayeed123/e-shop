@@ -323,16 +323,24 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
         if ((scannedProduct.category ?? '').isEmpty) {
           AppDialog.showErrorDialog(context, 'Item not found');
         } else {
-          await ref
-              .read(transactionStateProvider.notifier)
-              .addProductToCart(scannedProduct, '1');
-          context.pop();
+          await addToCartAction(scannedProduct);
         }
       } else {
         barcodeScanned = false;
         const error = 'Code is invalid';
         AppDialog.showErrorDialog(context, error);
       }
+    }
+  }
+
+  Future<void> addToCartAction(Product scannedProduct) async {
+    try {
+      await ref
+          .read(transactionStateProvider.notifier)
+          .addProductToCart(scannedProduct, '1');
+      context.pop();
+    } catch (e) {
+      AppDialog.showErrorDialog(context, e.toString());
     }
   }
 

@@ -32,7 +32,7 @@ class TransactionState extends _$TransactionState {
       if ((payload.status ?? '').toLowerCase() == 'completed') {
         for (CartProduct product in (payload.items ?? [])) {
           final productQuantity = (currentState?.cart ?? []).firstWhere(
-            (e) => e.item == product,
+            (e) => e.item == product.item,
             orElse: () => CartProduct(),
           );
 
@@ -98,44 +98,51 @@ class TransactionState extends _$TransactionState {
   }
 
   Future<void> addProductToCart(Product product, String quantity) async {
-    final cartProduct = CartProduct(item: product, quantity: quantity);
-    final currentState = state.asData?.value;
-    List<CartProduct> payload = currentState?.cart ?? [];
-    if ((payload.map((e) => e.item)).contains(product)) {
-      return;
-    } else {
-      payload = [...payload, cartProduct];
+    try {
+      final cartProduct = CartProduct(item: product, quantity: quantity);
+      final currentState = state.asData?.value;
+      List<CartProduct> payload = currentState?.cart ?? [];
+      if ((payload.map((e) => e.item)).contains(product)) {
+        return;
+      } else {
+        payload = [...payload, cartProduct];
+        final updatedStateSlice = TransactionStateModel(
+          orders: currentState?.orders,
+          currentOrder: currentState?.currentOrder,
+          cart: payload,
+        );
+        setState(updatedStateSlice);
+        updateCart(product, quantity);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateCart(Product product, String quantity) async {
+    try {
+      final currentState = state.asData?.value;
+      List<CartProduct> payload = currentState?.cart ?? [];
+      final newProduct = payload.firstWhere(
+        (e) => e.item?.sku == product.sku,
+        orElse: () => CartProduct(),
+      );
+      newProduct.quantity = quantity;
+      newProduct.totalPrice = (int.parse(newProduct.item?.sellingPrice ?? '0') *
+              int.parse(newProduct.quantity ?? '0'))
+          .toString();
+      payload = [...payload, newProduct];
+      payload = payload.toSet().toList();
+
       final updatedStateSlice = TransactionStateModel(
         orders: currentState?.orders,
         currentOrder: currentState?.currentOrder,
         cart: payload,
       );
       setState(updatedStateSlice);
-      updateCart(product, quantity);
+    } catch (e) {
+      rethrow;
     }
-  }
-
-  Future<void> updateCart(Product product, String quantity) async {
-    final currentState = state.asData?.value;
-    List<CartProduct> payload = currentState?.cart ?? [];
-    final newProduct = payload.firstWhere(
-      (e) => e.item?.sku == product.sku,
-      orElse: () => CartProduct(),
-    );
-    // payload.removeWhere((e) => e.item == newProduct.item);
-    newProduct.quantity = quantity;
-    newProduct.totalPrice = (int.parse(newProduct.item?.sellingPrice ?? '0') *
-            int.parse(newProduct.quantity ?? '0'))
-        .toString();
-    payload = [...payload, newProduct];
-    payload = payload.toSet().toList();
-
-    final updatedStateSlice = TransactionStateModel(
-      orders: currentState?.orders,
-      currentOrder: currentState?.currentOrder,
-      cart: payload,
-    );
-    setState(updatedStateSlice);
   }
 
   Future<void> removeItemFromCart(Product product) async {
