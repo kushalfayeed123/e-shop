@@ -138,7 +138,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
 
   Widget _buildOrderCard(TransactionModel order) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
+      constraints:
+          BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.3),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
@@ -199,8 +200,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
             thickness: 0.3,
           ),
           const SizedBox(height: 10),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.19,
+          Expanded(
             child: SingleChildScrollView(
               child: Column(
                 children: [
