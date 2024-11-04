@@ -23,7 +23,7 @@ class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
     super.initState();
 
     controller = MobileScannerController(
-      facing: CameraFacing.front,
+      facing: CameraFacing.back,
       returnImage: true,
     );
     _subscription = controller.barcodes.listen(_handleBarcode);

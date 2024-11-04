@@ -297,13 +297,13 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
           child: Scanner(
             onScanned: (BarcodeCapture value) async {
-              if ((value.barcodes[0].displayValue ?? '').isNotEmpty) {
-                if (barcodeScanned == false) {
+              if (barcodeScanned == false) {
+                if ((value.barcodes[0].displayValue ?? '').isNotEmpty) {
                   await _handleBarcode(value, context);
+                } else {
+                  barcodeScanned = false;
+                  AppDialog.showErrorDialog(context, 'Code is invalid');
                 }
-              } else {
-                barcodeScanned = false;
-                AppDialog.showErrorDialog(context, 'Code is invalid');
               }
             },
           ),

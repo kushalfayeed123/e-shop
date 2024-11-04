@@ -338,16 +338,16 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   }
 
   void _handleScan(BarcodeCapture value, BuildContext context) {
-    if ((value.barcodes[0].displayValue ?? '').isNotEmpty) {
-      if (barcodeScanned == false) {
+    if (barcodeScanned == false) {
+      if ((value.barcodes[0].displayValue ?? '').isNotEmpty) {
         _idController.text = value.barcodes[0].rawValue ?? '';
         barcodeScanned = true;
         setState(() {});
         Navigator.of(context).pop();
+      } else {
+        barcodeScanned = false;
+        AppDialog.showErrorDialog(context, 'Code is invalid');
       }
-    } else {
-      barcodeScanned = false;
-      AppDialog.showErrorDialog(context, 'Code is invalid');
     }
   }
 
