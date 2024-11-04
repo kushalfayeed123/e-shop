@@ -82,7 +82,13 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                 AppButton(
                   isActive: true,
                   background: Theme.of(context).colorScheme.primary,
-                  action: () => context.push('/newOrder'),
+                  action: () {
+                    ref
+                        .read(transactionStateProvider.notifier)
+                        .clearCurrentOrder();
+
+                    context.push('/newOrder');
+                  },
                   textColor: Colors.black,
                   text: 'New Order',
                   hasBorder: false,

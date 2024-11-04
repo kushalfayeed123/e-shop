@@ -12,9 +12,7 @@ class TransactionService implements ITransactionService {
   @override
   Future<void> createTransaction(TransactionModel transaction) async {
     try {
-      await _transactionDataCollectionReference
-          .doc(transaction.id)
-          .set(transaction.toJson());
+      await _transactionDataCollectionReference.add(transaction.toJson());
     } on FirebaseException catch (e) {
       final message = e.message ?? '';
 

@@ -1,4 +1,5 @@
 import 'package:eshop/presentation/shared/models/side_nav_item.model.dart';
+import 'package:eshop/state/providers/auth/auth.provider.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:eshop/state/providers/user/user.provider.dart';
@@ -19,7 +20,7 @@ List<SideNavItem> sideNavItems = [
     isActive: false,
   ),
   SideNavItem(
-    text: 'Inventory',
+    text: 'Products',
     icon: "products.png",
     isActive: false,
   ),
@@ -66,9 +67,16 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
     }
   }
 
+  void signOut() async {
+    await ref.watch(authStateProvider.notifier).signOut();
+    if (mounted) {
+      context.go('/login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    ref.watch(userStateProvider);
+    final userState = ref.watch(userStateProvider).value;
     ref.watch(productStateProvider);
     ref.watch(transactionStateProvider);
     final screenHeight = MediaQuery.of(context).size.height;
@@ -192,7 +200,7 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Jace Vibes',
+                                  userState?.currentUser?.name ?? '',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyLarge!
@@ -201,7 +209,7 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                Text('Admin',
+                                Text(userState?.currentUser?.role ?? '',
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall!
@@ -210,24 +218,31 @@ class _AppLayoutState extends ConsumerState<AppLayout> {
                             )
                           ],
                         ),
-                        SizedBox(
-                          height: 80,
-                          width: screenWidth * 0.5,
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/sign-out.png',
-                                width: 20,
-                                color: Theme.of(context).colorScheme.tertiary,
+                        InkWell(
+                          onTap: () => signOut(),
+                          child: SizedBox(
+                            height: 80,
+                            width: screenWidth * 0.5,
+                            child: Center(
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    'assets/images/sign-out.png',
+                                    width: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                  ),
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
+                                  Text(
+                                    'Logout',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  )
+                                ],
                               ),
-                              const SizedBox(
-                                width: 15,
-                              ),
-                              Text(
-                                'Logout',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              )
-                            ],
+                            ),
                           ),
                         ),
                       ],
