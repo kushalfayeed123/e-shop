@@ -274,8 +274,8 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
           description: _descriptionController.text,
           sku: widget.isEdit
               ? (product?.sku ?? '')
-              : (barcode ?? '').isNotEmpty
-                  ? barcode
+              : _idController.text.isNotEmpty
+                  ? _idController.text
                   : uuid.v4().split('-').join().substring(0, 14),
           category: _categoryController.text,
           costPrice: _costPriceController.text,
