@@ -41,48 +41,53 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyANnuaDSi5aymmIVRxaybPlzxH-jPZL7Kw',
-    appId: '1:105251594410:web:2146b8018cd5183e5af0d3',
-    messagingSenderId: '105251594410',
-    projectId: 'eshop-vibeswine',
-    authDomain: 'eshop-vibeswine.firebaseapp.com',
-    storageBucket: 'eshop-vibeswine.appspot.com',
-    measurementId: 'G-5R9Z3SZKDZ',
+    apiKey: 'AIzaSyDHLOX6x0ThAcBoRo9DF3g3dUzYljhQvU4',
+    appId: '1:641894575381:web:83d30d152a07b17d980d1c',
+    messagingSenderId: '641894575381',
+    projectId: 'grocery-app-ea4b9',
+    authDomain: 'grocery-app-ea4b9.firebaseapp.com',
+    storageBucket: 'grocery-app-ea4b9.appspot.com',
+    measurementId: 'G-LZHSVR1QM2',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDy1LUzEkSNUmo0dRFkh53FOGtlxC0t2KQ',
-    appId: '1:105251594410:android:7d66718e9d68d01e5af0d3',
-    messagingSenderId: '105251594410',
-    projectId: 'eshop-vibeswine',
-    storageBucket: 'eshop-vibeswine.appspot.com',
+    apiKey: 'AIzaSyC2wZ9hKmaZY60O7wu9tS7riC05ea9UzEE',
+    appId: '1:641894575381:android:55179110891d4440980d1c',
+    messagingSenderId: '641894575381',
+    projectId: 'grocery-app-ea4b9',
+    storageBucket: 'grocery-app-ea4b9.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDVrUQ7u_tXBcOfl5O91ES8ClBkhpL1CB4',
-    appId: '1:105251594410:ios:be0de471e7ce9f555af0d3',
-    messagingSenderId: '105251594410',
-    projectId: 'eshop-vibeswine',
-    storageBucket: 'eshop-vibeswine.appspot.com',
-    iosBundleId: 'com.example.eshop',
+    apiKey: 'AIzaSyDbcolVYrS9h-99XHy5E2Dt9JTH6Q1WPwQ',
+    appId: '1:641894575381:ios:8c5a67c03db90ebf980d1c',
+    messagingSenderId: '641894575381',
+    projectId: 'grocery-app-ea4b9',
+    storageBucket: 'grocery-app-ea4b9.appspot.com',
+    androidClientId: '641894575381-achnk8o4le7qa6m0ea9ce47on004adfk.apps.googleusercontent.com',
+    iosClientId: '641894575381-5stq6k02n6nr550082318mu67eqs08lv.apps.googleusercontent.com',
+    iosBundleId: 'com.bellES.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDVrUQ7u_tXBcOfl5O91ES8ClBkhpL1CB4',
-    appId: '1:105251594410:ios:be0de471e7ce9f555af0d3',
-    messagingSenderId: '105251594410',
-    projectId: 'eshop-vibeswine',
-    storageBucket: 'eshop-vibeswine.appspot.com',
+    apiKey: 'AIzaSyDbcolVYrS9h-99XHy5E2Dt9JTH6Q1WPwQ',
+    appId: '1:641894575381:ios:66b35cbbebac18e9980d1c',
+    messagingSenderId: '641894575381',
+    projectId: 'grocery-app-ea4b9',
+    storageBucket: 'grocery-app-ea4b9.appspot.com',
+    androidClientId: '641894575381-achnk8o4le7qa6m0ea9ce47on004adfk.apps.googleusercontent.com',
+    iosClientId: '641894575381-886qfdtiagio4fl2jvt1tdh7j1p2a8u6.apps.googleusercontent.com',
     iosBundleId: 'com.example.eshop',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyANnuaDSi5aymmIVRxaybPlzxH-jPZL7Kw',
-    appId: '1:105251594410:web:98960252d6aaa16b5af0d3',
-    messagingSenderId: '105251594410',
-    projectId: 'eshop-vibeswine',
-    authDomain: 'eshop-vibeswine.firebaseapp.com',
-    storageBucket: 'eshop-vibeswine.appspot.com',
-    measurementId: 'G-H9Z0Z1FE20',
+    apiKey: 'AIzaSyCt2jBtOU6U6ho241061tmptvcAxRg5he8',
+    appId: '1:641894575381:web:8a43baaab771f9c5980d1c',
+    messagingSenderId: '641894575381',
+    projectId: 'grocery-app-ea4b9',
+    authDomain: 'grocery-app-ea4b9.firebaseapp.com',
+    storageBucket: 'grocery-app-ea4b9.appspot.com',
+    measurementId: 'G-2Z6FCTHFCQ',
   );
+
 }

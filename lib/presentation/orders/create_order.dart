@@ -18,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class CreateOrder extends ConsumerStatefulWidget {
   const CreateOrder({super.key});
@@ -48,225 +49,286 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
           child: SizedBox(
         width: screenWidth,
         height: screenHeight,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: ResponsiveRowColumn(
+          layout: ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+              ? ResponsiveRowColumnType.ROW
+              : ResponsiveRowColumnType.COLUMN,
+          rowMainAxisAlignment: MainAxisAlignment.start,
+          columnMainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-                child: Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () => clearOrder(),
-                            child: Icon(
-                              Icons.arrow_back_rounded,
-                              size: 25,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            (cartState ?? []).isNotEmpty
-                                ? (currentOrder?.id ?? '')
-                                : "New Order",
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        formatedDate,
-                        style: const TextStyle(
-                            color: Color(0xFFB3B3B3), fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Order Filters
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: screenWidth * 0.3,
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: TextFormField(
-                          style: Theme.of(context).textTheme.bodySmall,
-                          onChanged: (value) => searchProducts(value),
-                          decoration: InputDecoration(
-                            suffixIcon: const Icon(Icons.search_rounded),
-                            labelText: 'Enter product name or product Id',
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .tertiary)),
-                            labelStyle: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      AppButton(
-                        isActive: true,
-                        background: Theme.of(context).colorScheme.primary,
-                        action: () => _openScanner(),
-                        textColor: Colors.black,
-                        text: 'Scan barcode',
-                        hasBorder: false,
-                        elevation: 5,
-                      )
-                    ],
-                  ),
-
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                      ),
-                      itemCount: searchedProducts.isEmpty
-                          ? allProducts.length
-                          : searchedProducts.length,
-                      itemBuilder: (context, index) {
-                        final product = searchedProducts.isEmpty
-                            ? allProducts[index]
-                            : searchedProducts[index];
-                        return ProductCard(
-                          product: product,
-                          createOrder: true,
-                        );
-                      },
-                    ),
-                  )
-                ],
-              ),
-            )),
-            Container(
-              width: screenWidth * 0.2,
-              height: screenHeight,
-              padding: const EdgeInsets.symmetric(
-                vertical: 30,
-                horizontal: 12,
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.75,
-                      child: SingleChildScrollView(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: (cartState ?? []).isEmpty
-                            ? [
-                                SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.6,
-                                  child: Center(
-                                    child: Text(
-                                      'Selected Products will show up here',
-                                      style:
-                                          Theme.of(context).textTheme.bodySmall,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                )
-                              ]
-                            : (cartState ?? [])
-                                .map((e) => _cartItem(e.item ?? Product()))
-                                .toList(),
-                      ))),
-                  (cartState ?? []).isEmpty
-                      ? const SizedBox.shrink()
-                      : Column(
+            ResponsiveRowColumnItem(
+              child: Expanded(
+                  child: Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Total',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                                Text(
-                                  computeTotal(),
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                )
-                              ],
+                            InkWell(
+                              onTap: () => clearOrder(),
+                              child: Icon(
+                                Icons.arrow_back_rounded,
+                                size: 25,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                             ),
                             const SizedBox(
-                              height: 40,
+                              width: 20,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InkWell(
-                                  onTap: () =>
-                                      showConfirmation(action: 'cancel'),
-                                  child: Container(
-                                    height: 45,
-                                    width: 80,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary)),
-                                    child: Center(
-                                      child: Text(
-                                        'Cancel',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => showConfirmation(action: 'save'),
-                                  child: Container(
-                                    height: 45,
-                                    width: 80,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        border: Border.all()),
-                                    child: Center(
-                                      child: Text(
-                                        'Save',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(color: Colors.black),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
+                            Text(
+                              (cartState ?? []).isNotEmpty
+                                  ? (currentOrder?.id ?? '')
+                                  : "New Order",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ],
+                        ),
+                        Text(
+                          formatedDate,
+                          style: const TextStyle(
+                              color: Color(0xFFB3B3B3), fontSize: 14),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // Order Filters
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: screenWidth * 0.3,
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: TextFormField(
+                            style: Theme.of(context).textTheme.bodySmall,
+                            onChanged: (value) => searchProducts(value),
+                            decoration: InputDecoration(
+                              suffixIcon: const Icon(Icons.search_rounded),
+                              labelText: 'Enter product name or product Id',
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary)),
+                              labelStyle: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        AppButton(
+                          isActive: true,
+                          background: Theme.of(context).colorScheme.primary,
+                          action: () => _openScanner(),
+                          textColor: Colors.black,
+                          text: 'Scan barcode',
+                          hasBorder: false,
+                          elevation: 5,
                         )
-                ],
-              ),
-            )
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+                    ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                        ? const SizedBox.shrink()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              AppButton(
+                                isActive: true,
+                                background: Colors.transparent,
+                                action: () => _showCartBottomSheet(cartState),
+                                textColor: Colors.white,
+                                text: 'View Cart',
+                                hasBorder: true,
+                                elevation: 5,
+                              )
+                            ],
+                          ),
+
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Expanded(
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: ResponsiveBreakpoints.of(context)
+                                  .largerThan(MOBILE)
+                              ? 4
+                              : 1,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: searchedProducts.isEmpty
+                            ? allProducts.length
+                            : searchedProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = searchedProducts.isEmpty
+                              ? allProducts[index]
+                              : searchedProducts[index];
+                          return ProductCard(
+                            product: product,
+                            createOrder: true,
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              )),
+            ),
+            ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                ? ResponsiveRowColumnItem(
+                    child: Container(
+                      width:
+                          ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                              ? screenWidth * 0.2
+                              : screenWidth,
+                      height:
+                          ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                              ? screenHeight
+                              : screenHeight * 0.2,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 30,
+                        horizontal: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      child: ResponsiveRowColumn(
+                        layout:
+                            ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                                ? ResponsiveRowColumnType.COLUMN
+                                : ResponsiveRowColumnType.ROW,
+                        columnMainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ResponsiveRowColumnItem(
+                            child: SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.75,
+                                child: SingleChildScrollView(
+                                    child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: (cartState ?? []).isEmpty
+                                      ? [
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.6,
+                                            child: Center(
+                                              child: Text(
+                                                'Selected Products will show up here',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          )
+                                        ]
+                                      : (cartState ?? [])
+                                          .map((e) => _cartItem(
+                                              e.item ?? Product(),
+                                              cartState,
+                                              null))
+                                          .toList(),
+                                ))),
+                          ),
+                          ResponsiveRowColumnItem(
+                            child: (cartState ?? []).isEmpty
+                                ? const SizedBox.shrink()
+                                : Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Total',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                          ),
+                                          Text(
+                                            computeTotal(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 40,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          InkWell(
+                                            onTap: () => showConfirmation(
+                                                action: 'cancel'),
+                                            child: Container(
+                                              height: 45,
+                                              width: 80,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  border: Border.all(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .primary)),
+                                              child: Center(
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: () => showConfirmation(
+                                                action: 'save'),
+                                            child: Container(
+                                              height: 45,
+                                              width: 80,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                  border: Border.all()),
+                                              child: Center(
+                                                child: Text(
+                                                  'Save',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                          color: Colors.black),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : const ResponsiveRowColumnItem(child: SizedBox.shrink())
           ],
         ),
       )),
@@ -333,8 +395,16 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
             .read(transactionStateProvider.notifier)
             .addProductToCart(scannedProduct, '1');
         barcodeScanned = true;
+        final snackBar = SnackBar(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          content: Text(
+            'Product has been added to cart.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         setState(() {});
-        // Navigator.of(context).pop();
+        Navigator.of(context).pop();
       } else {
         AppDialog.showErrorDialog(context, 'Item not found');
       }
@@ -343,8 +413,12 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     }
   }
 
-  Widget _cartItem(Product item) {
-    String quantity = (ref.watch(transactionStateProvider).value?.cart ?? [])
+  Widget _cartItem(
+    Product item,
+    List<CartProduct>? cartState,
+    StateSetter? setState,
+  ) {
+    final quantity = (cartState ?? [])
             .firstWhere((e) => e.item == item, orElse: () => CartProduct())
             .quantity ??
         '0';
@@ -382,6 +456,9 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                               .read(transactionStateProvider.notifier)
                               .updateCart(item, (count - 1).toString(), false);
                         }
+                        if (setState != null) {
+                          setState(() {});
+                        }
                       },
                       child: Image.asset(
                         'assets/images/minus-circle.png',
@@ -394,6 +471,9 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                         ref
                             .read(transactionStateProvider.notifier)
                             .updateCart(item, (count + 1).toString(), false);
+                        if (setState != null) {
+                          setState(() {});
+                        }
                       },
                       child: Image.asset(
                         'assets/images/add.png',
@@ -466,13 +546,162 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
       AppDialog.hideLoading(context);
       AppDialog.showSuccessDialog(
           context, 'Order has been registered successfully', action: () {
-        context.pop();
-        context.pop();
-        context.pop();
+        context.push('/orders');
       });
     } catch (e) {
       AppDialog.hideLoading(context);
       AppDialog.showErrorDialog(context, e.toString());
     }
+  }
+
+  void _showCartBottomSheet(List<CartProduct>? cartState) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) =>
+          StatefulBuilder(builder: (BuildContext context, setState) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5, // Adjust initial size as desired
+          minChildSize: 0.5,
+          maxChildSize: 0.8,
+          builder: (context, scrollController) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final screenHeight = MediaQuery.of(context).size.height;
+
+            return Container(
+              width: screenWidth,
+              height: screenHeight * 0.6,
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+              ),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: ResponsiveRowColumn(
+                  layout: ResponsiveRowColumnType.COLUMN,
+                  columnMainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ResponsiveRowColumnItem(
+                      child: SizedBox(
+                        height: screenHeight * 0.3,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: (cartState ?? []).isEmpty
+                                ? [
+                                    SizedBox(
+                                      height: screenHeight * 0.2,
+                                      child: Center(
+                                        child: Text(
+                                          'Selected Products will show up here',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    )
+                                  ]
+                                : (cartState ?? [])
+                                    .map((e) => _cartItem(e.item ?? Product(),
+                                        cartState, setState))
+                                    .toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    ResponsiveRowColumnItem(
+                      child: (cartState ?? []).isEmpty
+                          ? const SizedBox.shrink()
+                          : Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Total',
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                    Text(
+                                      computeTotal(),
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 40),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      onTap: () =>
+                                          showConfirmation(action: 'cancel'),
+                                      child: Container(
+                                        height: 45,
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Cancel',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () =>
+                                          showConfirmation(action: 'save'),
+                                      child: Container(
+                                        height: 45,
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          border: Border.all(),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Save',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }),
+    );
   }
 }

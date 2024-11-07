@@ -5,6 +5,7 @@ import 'package:eshop/presentation/products/widgets/product_card.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class ProductList extends ConsumerStatefulWidget {
   const ProductList({super.key});
@@ -110,9 +111,11 @@ class _ProductListState extends ConsumerState<ProductList> {
                   child: RefreshIndicator(
                     onRefresh: _handleRefresh,
                     child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                                ? 4
+                                : 1,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                       ),

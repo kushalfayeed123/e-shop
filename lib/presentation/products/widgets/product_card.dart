@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:io';
-
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/presentation/products/widgets/add_product_dialog.dart';
 import 'package:eshop/presentation/shared/constants.dart';
@@ -10,6 +8,7 @@ import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class ProductCard extends ConsumerStatefulWidget {
   final Product product;
@@ -31,8 +30,9 @@ class _ProductCardState extends ConsumerState<ProductCard> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return InkWell(
-      onTap: () =>
-          widget.createOrder ? addProductToCartAction() : openEditProductPage(),
+      onTap: () {
+        widget.createOrder ? addProductToCartAction() : openEditProductPage();
+      },
       child: Container(
         padding: const EdgeInsets.only(bottom: 10),
         width: MediaQuery.of(context).size.width * 0.3,
@@ -45,13 +45,20 @@ class _ProductCardState extends ConsumerState<ProductCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Image.file(
-                  File(widget.product.image ?? ''),
-                  fit: BoxFit.cover,
-                  height: 70,
-                  width: MediaQuery.of(context).size.width * 0.8,
-                ),
-              ),
+                  child: Image.network(
+                widget.product.image ?? '',
+                fit: BoxFit.cover,
+                height: 50,
+                width: MediaQuery.of(context).size.width * 0.8,
+              )
+                  // :
+                  // Image.file(
+                  //     File(widget.product.image ?? ''),
+                  //     fit: BoxFit.cover,
+                  //     height: 70,
+                  //     width: MediaQuery.of(context).size.width * 0.8,
+                  //   ),
+                  ),
               const SizedBox(
                 height: 10,
               ),
@@ -69,7 +76,10 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         SizedBox(
-                          width: screenWidth * 0.1,
+                          width: ResponsiveBreakpoints.of(context)
+                                  .largerThan(MOBILE)
+                              ? screenWidth * 0.1
+                              : screenWidth * 0.7,
                           child: Text(
                             widget.product.name ?? '',
                             overflow: TextOverflow.fade,
@@ -90,7 +100,10 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         SizedBox(
-                          width: screenWidth * 0.1,
+                          width: ResponsiveBreakpoints.of(context)
+                                  .largerThan(MOBILE)
+                              ? screenWidth * 0.1
+                              : screenWidth * 0.6,
                           child: Text(
                             '₦${oCcy.format(double.parse(widget.product.sellingPrice ?? '0'))}',
                             overflow: TextOverflow.fade,
@@ -111,7 +124,10 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         SizedBox(
-                          width: screenWidth * 0.1,
+                          width: ResponsiveBreakpoints.of(context)
+                                  .largerThan(MOBILE)
+                              ? screenWidth * 0.1
+                              : screenWidth * 0.6,
                           child: Text(
                             '${widget.product.quantityOnHand ?? 0}',
                             overflow: TextOverflow.fade,
@@ -136,6 +152,14 @@ class _ProductCardState extends ConsumerState<ProductCard> {
       await ref
           .read(transactionStateProvider.notifier)
           .addProductToCart(widget.product, '1');
+      final snackBar = SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        content: Text(
+          'Product has been added to cart.',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } catch (e) {
       AppDialog.showErrorDialog(context, e.toString());
     }

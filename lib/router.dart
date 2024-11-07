@@ -73,7 +73,7 @@ final routerProvider = Provider.autoDispose<GoRouter>((ref) {
         return CustomTransitionPage(
             key: UniqueKey(),
             child: const CreateOrder(),
-            reverseTransitionDuration: const Duration(seconds: 1),
+            reverseTransitionDuration: const Duration(milliseconds: 300),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return SlideTransition(

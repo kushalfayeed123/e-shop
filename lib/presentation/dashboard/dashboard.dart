@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -68,33 +69,41 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       child: Column(
         children: [
           // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ResponsiveRowColumn(
+            rowMainAxisAlignment: MainAxisAlignment.spaceBetween,
+            columnCrossAxisAlignment: CrossAxisAlignment.start,
+            rowSpacing: 5,
+            columnSpacing: 5,
+            layout: ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                ? ResponsiveRowColumnType.ROW
+                : ResponsiveRowColumnType.COLUMN,
             children: [
-              Row(
-                children: [
-                  Text(
-                    _computeGreeting(),
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    (userState?.name ?? ''),
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
+              ResponsiveRowColumnItem(
+                child: Row(
+                  children: [
+                    Text(
+                      _computeGreeting(),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      (userState?.name ?? ''),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
-              Text(
-                formatedDate,
-                style: const TextStyle(color: Color(0xFFB3B3B3), fontSize: 14),
+              ResponsiveRowColumnItem(
+                child: Text(
+                  formatedDate,
+                  style:
+                      const TextStyle(color: Color(0xFFB3B3B3), fontSize: 14),
+                ),
               ),
             ],
           ),
@@ -105,25 +114,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               _buildInfoCard("Total Orders", orderState.length.toString(),
                   const Color(0xFF1E1E1E), const Color(0xFFB3B3B3)),
               _buildInfoCard(
-                  "Completed Orders",
+                  "Confirmed Orders",
                   completedOrders.length.toString(),
                   const Color(0xFF1E1E1E),
                   const Color(0xFFB3B3B3)),
-              _buildInfoCard("Pending", pendingOrders.length.toString(),
+              _buildInfoCard("Pending Orders", pendingOrders.length.toString(),
                   const Color(0xFF1E1E1E), const Color(0xFFB3B3B3)),
             ],
           ),
           const SizedBox(height: 20),
           // Order List and Payment sections
           Expanded(
-            child: Row(
+            child: ResponsiveRowColumn(
+              rowMainAxisAlignment: MainAxisAlignment.spaceBetween,
+              columnCrossAxisAlignment: CrossAxisAlignment.start,
+              rowSpacing: 16,
+              columnSpacing: 5,
+              layout: ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                  ? ResponsiveRowColumnType.ROW
+                  : ResponsiveRowColumnType.COLUMN,
               children: [
-                Expanded(
-                  child: _buildOrderList(),
+                ResponsiveRowColumnItem(
+                  child: Expanded(
+                    child: _buildOrderList(),
+                  ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildPopularDishesSection(),
+                ResponsiveRowColumnItem(
+                  child: Expanded(
+                    child: _buildPopularDishesSection(),
+                  ),
                 ),
               ],
             ),
@@ -137,25 +156,39 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       String title, String value, Color bgColor, Color textColor) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(8.0),
-        padding: const EdgeInsets.all(16.0),
+        margin: const EdgeInsets.all(3.0),
+        padding: const EdgeInsets.all(8.0),
+        height: 120,
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               title,
-              style: TextStyle(color: textColor, fontSize: 16),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: textColor,
+                fontSize: ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                    ? 16
+                    : 14,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: Text(
+                value,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize:
+                        ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                            ? 24
+                            : 18,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -172,7 +205,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     orders.sort((a, b) => DateTime.parse(b.transactionDate ?? '')
         .compareTo(DateTime.parse(a.transactionDate ?? '')));
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(12),
@@ -196,7 +229,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _buildPopularDishesSection() {
     final state = ref.watch(productStateProvider).value?.products;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(12),
@@ -207,8 +240,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             "Popular Products",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(
-            height: 30,
+          SizedBox(
+            height:
+                ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 30 : 10,
           ),
           ProductsListView(products: state)
           // Add widgets for popular dishes
@@ -373,8 +407,7 @@ class ProductsListView extends StatelessWidget {
         itemBuilder: (context, index) {
           final product = products![index];
           return Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding: const EdgeInsets.all(8.0),
             child: Card(
               elevation: 2,
               shape: RoundedRectangleBorder(

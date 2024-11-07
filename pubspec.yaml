@@ -35,6 +35,7 @@ dependencies:
   mobile_scanner: ^5.1.1
   cached_network_image: ^3.4.1
   firebase_storage: ^12.3.4
+  image_picker_web: ^4.0.0
 
 
 dev_dependencies:

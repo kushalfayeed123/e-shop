@@ -2,18 +2,22 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/presentation/shared/widgets/scanner.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:uuid/uuid.dart';
 
 class AddProductDialog extends ConsumerStatefulWidget
@@ -52,6 +56,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
   int? reorderQuantity;
   String? status;
   File? image;
+  String uploadedImageUrl = '';
   bool barcodeScanned = false;
 
   @override
@@ -66,6 +71,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
       _costPriceController.text = product?.costPrice ?? '';
       _sellingPriceController.text = product?.sellingPrice ?? '';
       image = File(product?.image ?? '');
+      uploadedImageUrl = product?.image ?? '';
     }
     setState(() {});
   }
@@ -84,7 +90,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
       backgroundColor: Theme.of(context).colorScheme.secondary,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Container(
-        width: screenWidth * 0.5,
+        width: screenWidth * 0.8,
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Form(
@@ -116,16 +122,25 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
                 InkWell(
                   onTap: () => _pickImage(),
                   child: Container(
-                    width: screenWidth * 0.5,
+                    width: screenWidth * 0.75,
                     height: 120,
                     decoration: BoxDecoration(
                         color: const Color.fromARGB(255, 53, 56, 58),
                         borderRadius: BorderRadius.circular(5)),
                     child: Center(
-                      child: image != null
-                          ? Image.file(
-                              image ?? File(''),
+                      child: uploadedImageUrl.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: uploadedImageUrl,
                               fit: BoxFit.contain,
+                              progressIndicatorBuilder:
+                                  (context, url, progress) => SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator.adaptive(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      )),
                             )
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,42 +162,45 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    barcodeScanned
-                        ? _buildTextField('Product Id', _idController)
-                        : InkWell(
-                            onTap: () => _openScanner(),
-                            child: Container(
-                                margin: const EdgeInsets.only(top: 10),
-                                height: 45,
-                                width: screenWidth * 0.47,
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .tertiary),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: Center(
-                                  child: Text(
-                                    'Scan Barcode',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                )),
-                          ),
+                    _buildTextField('Product Id', _idController),
+                    InkWell(
+                      onTap: () => _openScanner(),
+                      child: Container(
+                          margin: const EdgeInsets.only(top: 10),
+                          height: 45,
+                          width: ResponsiveBreakpoints.of(context)
+                                  .largerThan(MOBILE)
+                              ? screenWidth * 0.47
+                              : screenWidth * 0.75,
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              border: Border.all(
+                                  color: Theme.of(context).colorScheme.primary),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Center(
+                            child: Text(
+                              'Scan Barcode',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(color: Colors.black),
+                            ),
+                          )),
+                    ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: screenWidth * 0.23,
+                      width: screenWidth * 0.35,
                       child: _buildTextField('Quantity', _quantityController),
                     ),
                     SizedBox(
-                      width: screenWidth * 0.23,
+                      width: screenWidth * 0.35,
                       child: _buildTextField('Category', _categoryController),
                     )
                   ],
@@ -191,12 +209,12 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      width: screenWidth * 0.23,
+                      width: screenWidth * 0.35,
                       child:
                           _buildTextField('Cost Price', _costPriceController),
                     ),
                     SizedBox(
-                      width: screenWidth * 0.23,
+                      width: screenWidth * 0.35,
                       child: _buildTextField(
                           'Selling Price', _sellingPriceController),
                     )
@@ -211,7 +229,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
                       background: Theme.of(context).colorScheme.primary,
                       action: () => onAddProduct(),
                       textColor: Colors.black,
-                      text: widget.isEdit ? 'Update Product' : 'Add Product',
+                      text: widget.isEdit ? 'Update' : 'Add',
                       hasBorder: false,
                       elevation: 10,
                     ),
@@ -226,7 +244,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
                               onDeleteProduct();
                             },
                             textColor: Colors.white,
-                            text: 'Delete Product',
+                            text: 'Delete',
                             hasBorder: false,
                             elevation: 10,
                           )
@@ -284,7 +302,7 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
           quantityReserved: _quantityController.text,
           image: (widget.isEdit && image == null)
               ? product?.image
-              : image?.path ?? '',
+              : uploadedImageUrl,
           status: widget.isEdit ? product?.status ?? '' : 'Active',
           createdAt: widget.isEdit
               ? (product?.createdAt ?? '')
@@ -351,14 +369,27 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
     }
   }
 
+  final storageReference = FirebaseStorage.instance.ref();
+
   void _pickImage() async {
     try {
       final ImagePicker picker = ImagePicker();
       final xImage = await picker.pickImage(source: ImageSource.gallery);
-      image = File(xImage?.path ?? '');
+      String path = xImage?.path ?? '';
+      Uint8List imageData = await XFile(path).readAsBytes();
 
+      final mountainImagesRef = storageReference.child("images/$path.png");
+      AppDialog.showLoading(context);
+
+      await mountainImagesRef.putData(imageData);
+
+      uploadedImageUrl = await mountainImagesRef.getDownloadURL();
+
+      AppDialog.hideLoading(context);
       setState(() {});
     } catch (e) {
+      AppDialog.hideLoading(context);
+
       AppDialog.showErrorDialog(context, 'Unable to upload image: $e');
     }
   }

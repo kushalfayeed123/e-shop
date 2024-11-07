@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
@@ -103,8 +104,11 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
               onRefresh: _handleRefresh,
               child: GridView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+                          ? 3
+                          : 1,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                 ),

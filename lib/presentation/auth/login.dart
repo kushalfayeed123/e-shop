@@ -39,19 +39,33 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
+    // Define responsive width, font size, and padding
+    double containerWidth = screenWidth * 0.9;
+    double fontSize = 24;
+    double padding = 20;
+
+    if (screenWidth > 1200) {
+      containerWidth = screenWidth * 0.4;
+      fontSize = 32;
+      padding = 30;
+    } else if (screenWidth > 800) {
+      containerWidth = screenWidth * 0.6;
+      fontSize = 28;
+      padding = 25;
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(padding),
         child: Center(
           child: Card(
             color: Theme.of(context).colorScheme.secondary,
             child: Container(
-              height: screenHeight * 0.7,
-              width: screenWidth * 0.45,
-              padding: const EdgeInsets.all(20),
+              width: containerWidth,
+              padding: EdgeInsets.all(padding),
               child: Center(
                 child: Form(
                   key: _formKey,
@@ -61,9 +75,10 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                       Text(
                         'Welcome to Vibes Wine',
                         style: GoogleFonts.poppins(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
-                            color: Theme.of(context).colorScheme.primary),
+                          fontSize: fontSize,
+                          fontWeight: FontWeight.w800,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
@@ -74,11 +89,13 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                           labelStyle: Theme.of(context).textTheme.bodyMedium,
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                         ),
                         validator: (value) {
@@ -101,11 +118,13 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                           labelStyle: Theme.of(context).textTheme.bodyMedium,
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                         ),
                         validator: (value) {
@@ -128,12 +147,15 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Padding(
+                        child: Padding(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 12),
+                            horizontal: fontSize * 1.5,
+                            vertical: 12,
+                          ),
                           child: Text(
                             'Login',
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(
+                                color: Colors.black, fontSize: fontSize * 0.6),
                           ),
                         ),
                       ),

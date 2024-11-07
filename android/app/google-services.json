@@ -1,26 +1,87 @@
 {
   "project_info": {
-    "project_number": "105251594410",
-    "project_id": "eshop-vibeswine",
-    "storage_bucket": "eshop-vibeswine.appspot.com"
+    "project_number": "641894575381",
+    "project_id": "grocery-app-ea4b9",
+    "storage_bucket": "grocery-app-ea4b9.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:105251594410:android:7d66718e9d68d01e5af0d3",
+        "mobilesdk_app_id": "1:641894575381:android:c840aa0c9494ad43980d1c",
         "android_client_info": {
-          "package_name": "com.eshop.app"
+          "package_name": "com.app.grocery_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "641894575381-achnk8o4le7qa6m0ea9ce47on004adfk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.grocery_app",
+            "certificate_hash": "f5ef401a9baaf2e2b3f703f35fa023cd06a98608"
+          }
+        },
+        {
+          "client_id": "641894575381-92nsdv3vjjfde9gcua5ts8btmg5ehr2v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDy1LUzEkSNUmo0dRFkh53FOGtlxC0t2KQ"
+          "current_key": "AIzaSyC2wZ9hKmaZY60O7wu9tS7riC05ea9UzEE"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641894575381-92nsdv3vjjfde9gcua5ts8btmg5ehr2v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "641894575381-3viqj5b86i0ct6e7l6hfves4rg7v1c0t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.groceryApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641894575381:android:55179110891d4440980d1c",
+        "android_client_info": {
+          "package_name": "com.bellES.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "641894575381-92nsdv3vjjfde9gcua5ts8btmg5ehr2v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2wZ9hKmaZY60O7wu9tS7riC05ea9UzEE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641894575381-92nsdv3vjjfde9gcua5ts8btmg5ehr2v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "641894575381-3viqj5b86i0ct6e7l6hfves4rg7v1c0t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.groceryApp"
+              }
+            }
+          ]
         }
       }
     }
