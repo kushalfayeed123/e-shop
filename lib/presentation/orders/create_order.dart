@@ -33,6 +33,13 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   bool barcodeScanned = false;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    barcodeScanned = false;
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -68,7 +75,9 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                         Row(
                           children: [
                             InkWell(
-                              onTap: () => clearOrder(),
+                              onTap: () {
+                                context.pop();
+                              },
                               child: Icon(
                                 Icons.arrow_back_rounded,
                                 size: 25,
@@ -391,9 +400,6 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
         orElse: () => Product(),
       );
       if ((scannedProduct.sku != null)) {
-        await ref
-            .read(transactionStateProvider.notifier)
-            .addProductToCart(scannedProduct, '1');
         barcodeScanned = true;
         final snackBar = SnackBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
@@ -402,6 +408,10 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         );
+        await ref
+            .read(transactionStateProvider.notifier)
+            .addProductToCart(scannedProduct, '1');
+
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         setState(() {});
         Navigator.of(context).pop();

@@ -32,14 +32,14 @@ class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
     setState(() {});
   }
 
-  // @override
-  // Future<void> dispose() async {
-  //   WidgetsBinding.instance.removeObserver(this);
-  //   unawaited(_subscription?.cancel());
-  //   _subscription = null;
-  //   controller.dispose();
-  //   super.dispose();
-  // }
+  @override
+  Future<void> dispose() async {
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+    controller.dispose();
+    super.dispose();
+  }
 
   _handleBarcode(value) {
     widget.onScanned(value);

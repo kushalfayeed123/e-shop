@@ -91,7 +91,9 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                     context.push('/newOrder');
                   },
                   textColor: Colors.black,
-                  text: 'New Order',
+                  text: orderState?.currentOrder != null
+                      ? 'Continue Order'
+                      : 'New Order',
                   hasBorder: false,
                   elevation: 5,
                 )
