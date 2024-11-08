@@ -333,7 +333,7 @@ class OrderListView extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${(order.items ?? []).length} items purchased',
+                              '${((order.items ?? []).map((e) => e.quantity).reduce((a, b) => (double.parse(a ?? '0') + double.parse(b ?? '0')).toString()))} item(s) purchased',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall!

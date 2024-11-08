@@ -1,7 +1,9 @@
 import 'package:eshop/core/domain/abstractions/auth.abstraction.dart';
+import 'package:eshop/core/domain/abstractions/notification.abstraction.dart';
 import 'package:eshop/core/domain/abstractions/product.abstraction.dart';
 import 'package:eshop/core/domain/abstractions/transaction.abstraction.dart';
 import 'package:eshop/core/domain/abstractions/user.abstraction.dart';
+import 'package:eshop/core/domain/business/notification.service.dart';
 import 'package:eshop/core/infrastructure/services/auth.service.dart';
 import 'package:eshop/core/infrastructure/services/product.service.dart';
 import 'package:eshop/core/infrastructure/services/transaction.service.dart';
@@ -16,4 +18,6 @@ void setupLocator() {
   locator.registerLazySingleton<IProductService>(() => ProductService());
   locator
       .registerLazySingleton<ITransactionService>(() => TransactionService());
+  locator
+      .registerLazySingleton<INotificationService>(() => NotificationService());
 }

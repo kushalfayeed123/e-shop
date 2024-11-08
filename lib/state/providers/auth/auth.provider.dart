@@ -33,6 +33,7 @@ class AuthState extends _$AuthState {
                   : true,
           signedInUser: user.user?.uid ?? '');
       await ref.read(userStateProvider.notifier).getCurrentUser();
+      await ref.read(userStateProvider.notifier).fcmSetup();
       state = AsyncValue.data(res);
     } catch (e, s) {
       state = AsyncValue.error(e, s);

@@ -556,7 +556,12 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
       AppDialog.hideLoading(context);
       AppDialog.showSuccessDialog(
           context, 'Order has been registered successfully', action: () {
-        context.push('/orders');
+        context.pop();
+        context.pop();
+        context.pop();
+        if (ResponsiveBreakpoints.of(context).smallerThan(TABLET)) {
+          context.pop();
+        }
       });
     } catch (e) {
       AppDialog.hideLoading(context);

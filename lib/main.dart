@@ -1,8 +1,10 @@
+import 'package:eshop/core/domain/abstractions/notification.abstraction.dart';
 import 'package:eshop/firebase_options.dart';
 import 'package:eshop/locator.dart';
 
 import 'package:eshop/router.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +15,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await FirebaseMessaging.instance.setAutoInitEnabled(true);
+
   setupLocator();
   runApp(const ProviderScope(child: MyApp()));
 }
