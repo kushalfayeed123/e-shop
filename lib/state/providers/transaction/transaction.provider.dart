@@ -29,9 +29,9 @@ class TransactionState extends _$TransactionState {
   Future<void> createTransaction(TransactionModel payload) async {
     try {
       final currentState = state.asData?.value;
-      final userstate = ref.watch(userStateProvider).value;
-      final allAdminUsers = (userstate?.allUsers ?? [])
-          .where((e) => (e.role ?? '').toLowerCase() == 'admin');
+      final allUsers = await ref.read(userStateProvider.notifier).returnUsers();
+      final allAdminUsers =
+          allUsers.where((e) => (e.role ?? '').toLowerCase() == 'admin');
 
       final tokens = allAdminUsers.map((e) => e.device?.token ?? '').toList();
       await _transactionService.createTransaction(payload, tokens);

@@ -40,6 +40,11 @@ class UserState extends _$UserState {
     setState(newState);
   }
 
+  Future<List<UserModel>> returnUsers() async {
+    final users = await _userService.getUsers();
+    return users;
+  }
+
   Future<void> fcmSetup() async {
     try {
       final messaging = FirebaseMessaging.instance;
