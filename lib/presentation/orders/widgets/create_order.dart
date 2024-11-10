@@ -35,23 +35,19 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   bool barcodeScanned = false;
 
   @override
-  void initState() {
-    super.initState();
-    final state = ref.read(productStateProvider).value;
-    allProducts = state?.products ?? [];
-    searchedProducts = allProducts;
-    setState(() {});
-  }
-
-  @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+    final state = ref.watch(productStateProvider).value;
+    allProducts = state?.products ?? [];
+    searchedProducts = allProducts;
     barcodeScanned = false;
     final currentOrder =
         ref.watch(transactionStateProvider).value?.currentOrder;
-    await ref
-        .read(transactionStateProvider.notifier)
-        .getTransaction(currentOrder?.id ?? '');
+    if (currentOrder != null) {
+      await ref
+          .read(transactionStateProvider.notifier)
+          .getTransaction(currentOrder.id ?? '');
+    }
   }
 
   @override
