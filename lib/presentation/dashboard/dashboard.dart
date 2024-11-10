@@ -34,7 +34,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     } else if (hour >= 17 && hour < 21) {
       return "Good evening! ";
     } else {
-      return "Good evening!";
+      return "Good evening! ";
     }
   }
 
@@ -260,7 +260,7 @@ class OrderListView extends ConsumerWidget {
 
   Future _handleRefresh(WidgetRef ref, BuildContext context) async {
     try {
-      await ref.read(productStateProvider.notifier).getProducts();
+      await ref.read(transactionStateProvider.notifier).getTransactions();
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

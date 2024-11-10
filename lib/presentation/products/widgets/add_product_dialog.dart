@@ -10,7 +10,6 @@ import 'package:eshop/presentation/shared/widgets/app_button.dart';
 import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/presentation/shared/widgets/scanner.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -369,23 +368,19 @@ class AddProductDialogState extends ConsumerState<AddProductDialog> {
     }
   }
 
-  final storageReference = FirebaseStorage.instance.ref();
-
   void _pickImage() async {
     try {
       final ImagePicker picker = ImagePicker();
       final xImage = await picker.pickImage(source: ImageSource.gallery);
       String path = xImage?.path ?? '';
       Uint8List imageData = await XFile(path).readAsBytes();
+      uploadedImageUrl = await ref
+          .read(productStateProvider.notifier)
+          .uploadProductImage(imageData, path);
 
-      final mountainImagesRef = storageReference.child("images/$path.png");
       AppDialog.showLoading(context);
 
-      await mountainImagesRef.putData(imageData);
-
-      uploadedImageUrl = await mountainImagesRef.getDownloadURL();
-
-      AppDialog.hideLoading(context);
+      uploadedImageUrl = AppDialog.hideLoading(context);
       setState(() {});
     } catch (e) {
       AppDialog.hideLoading(context);

@@ -23,7 +23,9 @@ class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
     super.initState();
 
     controller = MobileScannerController(
-      facing: CameraFacing.back,
+      facing: ResponsiveBreakpoints.of(context).largerThan(MOBILE)
+          ? CameraFacing.front
+          : CameraFacing.back,
       returnImage: true,
     );
     _subscription = controller.barcodes.listen(_handleBarcode);
@@ -45,15 +47,41 @@ class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
     widget.onScanned(value);
   }
 
+  _switchCamera() {
+    controller.switchCamera();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RotatedBox(
-      quarterTurns:
-          ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
-      child: MobileScanner(
-        controller: controller,
-        onDetect: (value) => _handleBarcode,
+    return Stack(children: [
+      RotatedBox(
+        quarterTurns:
+            ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
+        child: MobileScanner(
+          controller: controller,
+          onDetect: (value) => _handleBarcode,
+        ),
       ),
-    );
+      Positioned.fill(
+        bottom: 20,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                border:
+                    Border.all(color: Theme.of(context).colorScheme.primary),
+                borderRadius: BorderRadius.circular(100)),
+            child: IconButton(
+                onPressed: () => _switchCamera(),
+                icon: Icon(
+                  Icons.cameraswitch_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 40,
+                )),
+          ),
+        ),
+      )
+    ]);
   }
 }

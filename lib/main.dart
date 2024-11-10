@@ -1,4 +1,3 @@
-import 'package:eshop/core/domain/abstractions/notification.abstraction.dart';
 import 'package:eshop/firebase_options.dart';
 import 'package:eshop/locator.dart';
 

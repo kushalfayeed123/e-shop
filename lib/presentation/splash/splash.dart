@@ -1,14 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class Splash extends StatefulWidget {
+class Splash extends ConsumerStatefulWidget {
   const Splash({super.key});
 
   @override
-  State<Splash> createState() => _SplashState();
+  ConsumerState<Splash> createState() => _SplashState();
 }
 
-class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
+class _SplashState extends ConsumerState<Splash>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -16,12 +19,18 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    final currentUser = FirebaseAuth.instance.currentUser;
+
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..forward().then((_) {
         // Navigate to login after the animation ends
-        context.go('/login');
+        if (currentUser != null) {
+          context.go('/dashboard');
+        } else {
+          context.go('/login');
+        }
       });
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(

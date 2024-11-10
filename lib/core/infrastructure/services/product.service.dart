@@ -1,13 +1,18 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eshop/core/domain/abstractions/product.abstraction.dart';
 import 'package:eshop/core/domain/entities/product.entity.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ProductService implements IProductService {
   final CollectionReference<Map<String, dynamic>>
       _productDataCollectionReference =
       FirebaseFirestore.instance.collection("products");
+  final storageReference = FirebaseStorage.instance.ref();
+
   @override
   Future<void> createProduct(Product product) async {
     try {
@@ -93,6 +98,24 @@ class ProductService implements IProductService {
       final message = e.toString();
 
       throw HttpException(message);
+    }
+  }
+
+  @override
+  Future<String> uploadProductImage(Uint8List imageData, String path) async {
+    try {
+      bool hasConnection = await InternetConnection().hasInternetAccess;
+      if (hasConnection) {
+        final mountainImagesRef = storageReference.child("images/$path.png");
+        await mountainImagesRef.putData(imageData);
+        final downloadUrl = await mountainImagesRef.getDownloadURL();
+        return downloadUrl;
+      } else {
+        throw const HttpException(
+            'You do not have a stable internet connection.');
+      }
+    } catch (e) {
+      throw HttpException(e.toString());
     }
   }
 }

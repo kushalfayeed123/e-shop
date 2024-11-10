@@ -16,6 +16,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -31,11 +32,26 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   List<Product> allProducts = [];
   List<Product> searchedProducts = [];
   bool barcodeScanned = false;
+  bool hasConnection = true;
 
   @override
-  void didChangeDependencies() {
+  void initState() {
+    super.initState();
+    final state = ref.read(productStateProvider).value;
+    allProducts = state?.products ?? [];
+    searchedProducts = allProducts;
+  }
+
+  @override
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     barcodeScanned = false;
+    hasConnection = await InternetConnection().hasInternetAccess;
+    final currentOrder =
+        ref.watch(transactionStateProvider).value?.currentOrder;
+    await ref
+        .read(transactionStateProvider.notifier)
+        .getTransaction(currentOrder?.id ?? '');
     setState(() {});
   }
 
@@ -43,11 +59,10 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final state = ref.watch(productStateProvider).value;
     final cartState = ref.watch(transactionStateProvider).value?.cart;
     final currentOrder =
         ref.watch(transactionStateProvider).value?.currentOrder;
-    allProducts = state?.products ?? [];
+
     final formatedDate = DateFormat.yMMMEd().format(DateTime.now());
 
     return Scaffold(
@@ -174,13 +189,9 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),
-                        itemCount: searchedProducts.isEmpty
-                            ? allProducts.length
-                            : searchedProducts.length,
+                        itemCount: searchedProducts.length,
                         itemBuilder: (context, index) {
-                          final product = searchedProducts.isEmpty
-                              ? allProducts[index]
-                              : searchedProducts[index];
+                          final product = searchedProducts[index];
                           return ProductCard(
                             product: product,
                             createOrder: true,
@@ -395,7 +406,9 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
       BarcodeCapture barcode, BuildContext context) async {
     try {
       final scanResult = barcode.barcodes[0].rawValue ?? '';
-      final scannedProduct = allProducts.firstWhere(
+      final state = ref.read(productStateProvider).value;
+      final products = state?.products ?? [];
+      final scannedProduct = products.firstWhere(
         (e) => e.sku == scanResult,
         orElse: () => Product(),
       );
@@ -413,11 +426,13 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
             .addProductToCart(scannedProduct, '1');
 
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        setState(() {});
         Navigator.of(context).pop();
       } else {
+        barcodeScanned = true;
+
         AppDialog.showErrorDialog(context, 'Item not found');
       }
+      setState(() {});
     } catch (e) {
       AppDialog.showErrorDialog(context, e.toString());
     }
@@ -500,7 +515,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
 
   void searchProducts(String param) {
     if (param.isEmpty) {
-      searchedProducts = [];
+      searchedProducts = allProducts;
     } else {
       searchedProducts = allProducts
           .where((e) =>
@@ -531,28 +546,51 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     context.pop();
   }
 
-  void createOrder(bool isCancel) async {
+  void transactionAction(bool isCancel) {
+    final transactionState = ref.watch(transactionStateProvider).value;
+    final payload = TransactionModel(
+        id: transactionState?.currentOrder?.id ?? '',
+        userId: FirebaseAuth.instance.currentUser?.uid,
+        transactionType: 'Purchase',
+        items: (transactionState?.cart ?? []).toList(),
+        totalAmount: itemsTotal().toString(),
+        transactionDate: DateTime.now().toString(),
+        status: isCancel ? 'In progress' : 'Completed');
+    if (transactionState?.currentOrder != null) {
+      ref.read(transactionStateProvider.notifier).updateTransaction(payload);
+    } else {
+      ref.read(transactionStateProvider.notifier).createTransaction(payload);
+    }
+  }
+
+  void createOfflineTransaction(bool isCancel) {
+    try {
+      transactionAction(isCancel);
+      AppDialog.showSuccessDialog(
+          context, 'Order has been registered successfully', action: () {
+        context.pop();
+        context.pop();
+        context.pop();
+        if (ResponsiveBreakpoints.of(context).smallerThan(TABLET)) {
+          context.pop();
+        }
+      });
+    } catch (e) {
+      AppDialog.showErrorDialog(context, e.toString());
+    }
+  }
+
+  void createOrder(bool isCancel) {
+    hasConnection
+        ? createOnlineOrder(isCancel)
+        : createOfflineTransaction(isCancel);
+  }
+
+  void createOnlineOrder(bool isCancel) async {
     try {
       AppDialog.showLoading(context);
-      final transactionState = ref.watch(transactionStateProvider).value;
-      final payload = TransactionModel(
-          id: transactionState?.currentOrder?.id ?? '',
-          userId: FirebaseAuth.instance.currentUser?.uid,
-          transactionType: 'Purchase',
-          items: (transactionState?.cart ?? []).toList(),
-          totalAmount: itemsTotal().toString(),
-          transactionDate: DateTime.now().toString(),
-          status: isCancel ? 'In progress' : 'Completed');
 
-      if (transactionState?.currentOrder != null) {
-        await ref
-            .read(transactionStateProvider.notifier)
-            .updateTransaction(payload);
-      } else {
-        await ref
-            .read(transactionStateProvider.notifier)
-            .createTransaction(payload);
-      }
+      transactionAction(isCancel);
       AppDialog.hideLoading(context);
       AppDialog.showSuccessDialog(
           context, 'Order has been registered successfully', action: () {

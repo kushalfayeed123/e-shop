@@ -1,10 +1,10 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eshop/core/domain/abstractions/transaction.abstraction.dart';
 import 'package:eshop/core/domain/entities/transaction.entity.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class TransactionService implements ITransactionService {
   final CollectionReference<Map<String, dynamic>>
@@ -15,15 +15,18 @@ class TransactionService implements ITransactionService {
   Future<void> createTransaction(
       TransactionModel transaction, List<String> tokens) async {
     try {
-      if (tokens.isNotEmpty) {
-        for (var token in tokens) {
-          await sendNotification(
-              token,
-              'You have a new order with status: ${transaction.status}. click to view new orders',
-              'New Order for Vibes Wine');
+      bool hasConnection = await InternetConnection().hasInternetAccess;
+      await _transactionDataCollectionReference.add(transaction.toJson());
+      if (hasConnection) {
+        if (tokens.isNotEmpty) {
+          for (var token in tokens) {
+            await sendNotification(
+                token,
+                'You have a new order with status: ${transaction.status}. click to view new orders',
+                'New Order for Vibes Wine');
+          }
         }
       }
-      await _transactionDataCollectionReference.add(transaction.toJson());
     } on FirebaseException catch (e) {
       final message = e.message ?? '';
 

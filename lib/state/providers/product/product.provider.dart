@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:eshop/core/domain/abstractions/product.abstraction.dart';
 import 'package:eshop/core/domain/entities/product.entity.dart';
@@ -78,6 +79,14 @@ class ProductState extends _$ProductState {
     try {
       await _productService.deleteProduct(id);
       await getProducts();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> uploadProductImage(Uint8List imageData, String path) async {
+    try {
+      return await _productService.uploadProductImage(imageData, path);
     } catch (e) {
       rethrow;
     }

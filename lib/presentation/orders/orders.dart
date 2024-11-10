@@ -137,9 +137,6 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
         await ref
             .read(transactionStateProvider.notifier)
             .addProductToCart(item.item ?? Product(), item.quantity ?? '');
-        await ref
-            .read(transactionStateProvider.notifier)
-            .getTransaction(order.id ?? '');
       }
       if (mounted) {
         context.push('/newOrder');
