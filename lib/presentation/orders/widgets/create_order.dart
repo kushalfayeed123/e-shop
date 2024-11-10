@@ -13,6 +13,7 @@ import 'package:eshop/presentation/shared/widgets/scanner.dart';
 import 'package:eshop/state/providers/product/product.provider.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,7 +33,6 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   List<Product> allProducts = [];
   List<Product> searchedProducts = [];
   bool barcodeScanned = false;
-  bool hasConnection = true;
 
   @override
   void initState() {
@@ -40,19 +40,18 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     final state = ref.read(productStateProvider).value;
     allProducts = state?.products ?? [];
     searchedProducts = allProducts;
+    setState(() {});
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
     barcodeScanned = false;
-    hasConnection = await InternetConnection().hasInternetAccess;
     final currentOrder =
         ref.watch(transactionStateProvider).value?.currentOrder;
     await ref
         .read(transactionStateProvider.notifier)
         .getTransaction(currentOrder?.id ?? '');
-    setState(() {});
   }
 
   @override
@@ -580,10 +579,18 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     }
   }
 
-  void createOrder(bool isCancel) {
-    hasConnection
-        ? createOnlineOrder(isCancel)
-        : createOfflineTransaction(isCancel);
+  void createOrder(bool isCancel) async {
+    try {
+      final hasConnection = await InternetConnection().hasInternetAccess;
+
+      hasConnection
+          ? createOnlineOrder(isCancel)
+          : createOfflineTransaction(isCancel);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 
   void createOnlineOrder(bool isCancel) async {
