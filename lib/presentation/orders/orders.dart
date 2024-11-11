@@ -3,6 +3,7 @@ import 'package:eshop/core/domain/entities/product.entity.dart';
 import 'package:eshop/core/domain/entities/transaction.entity.dart';
 import 'package:eshop/presentation/shared/constants.dart';
 import 'package:eshop/presentation/shared/widgets/app_button.dart';
+import 'package:eshop/presentation/shared/widgets/app_dialog.dart';
 import 'package:eshop/state/providers/transaction/transaction.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,11 +85,15 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                   isActive: true,
                   background: Theme.of(context).colorScheme.primary,
                   action: () {
-                    ref
-                        .read(transactionStateProvider.notifier)
-                        .clearCurrentOrder();
+                    try {
+                      ref
+                          .read(transactionStateProvider.notifier)
+                          .clearCurrentOrder();
 
-                    context.push('/newOrder');
+                      context.push('/newOrder');
+                    } catch (e) {
+                      AppDialog.showErrorDialog(context, e.toString());
+                    }
                   },
                   textColor: Colors.black,
                   text: 'New Order',

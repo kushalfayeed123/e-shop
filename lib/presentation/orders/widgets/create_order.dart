@@ -35,14 +35,24 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
   bool barcodeScanned = false;
 
   @override
-  void didChangeDependencies() async {
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeOrderData();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
     super.didChangeDependencies();
-    final state = ref.watch(productStateProvider).value;
+    barcodeScanned = false;
+  }
+
+  Future<void> _initializeOrderData() async {
+    final state = ref.read(productStateProvider).value;
     allProducts = state?.products ?? [];
     searchedProducts = allProducts;
-    barcodeScanned = false;
-    final currentOrder =
-        ref.watch(transactionStateProvider).value?.currentOrder;
+    final currentOrder = ref.read(transactionStateProvider).value?.currentOrder;
     if (currentOrder != null) {
       await ref
           .read(transactionStateProvider.notifier)
@@ -515,6 +525,9 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
       searchedProducts = allProducts
           .where((e) =>
               (e.name ?? '').toLowerCase().contains(param.toLowerCase()) ||
+              (e.description ?? '')
+                  .toLowerCase()
+                  .contains(param.toLowerCase()) ||
               (e.sku ?? '').toLowerCase().contains(param.toLowerCase()))
           .toList();
     }

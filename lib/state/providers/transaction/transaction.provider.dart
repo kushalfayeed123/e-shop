@@ -75,11 +75,15 @@ class TransactionState extends _$TransactionState {
   }
 
   void clearCurrentOrder() {
-    final currentState = state.asData?.value;
+    try {
+      final currentState = state.asData?.value;
 
-    final newState = TransactionStateModel(
-        orders: currentState?.orders, currentOrder: null, cart: []);
-    setState(newState);
+      final newState = TransactionStateModel(
+          orders: currentState?.orders, currentOrder: null, cart: []);
+      setState(newState);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> getTransactions() async {
