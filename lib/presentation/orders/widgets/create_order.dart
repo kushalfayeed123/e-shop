@@ -58,6 +58,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
           .read(transactionStateProvider.notifier)
           .getTransaction(currentOrder.id ?? '');
     }
+    setState(() {});
   }
 
   @override
