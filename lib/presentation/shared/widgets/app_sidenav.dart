@@ -59,10 +59,10 @@ class _AppSidenavState extends ConsumerState<AppSidenav> {
       case 0:
         widget.fetchData();
       case 1:
-        await ref.read(transactionStateProvider.notifier).getTransactions();
+        ref.read(transactionStateProvider.notifier).getTransactions();
         break;
       case 2:
-        await ref.read(productStateProvider.notifier).getProducts();
+        ref.read(productStateProvider.notifier).getProducts();
       default:
     }
 
