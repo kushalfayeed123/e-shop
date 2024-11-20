@@ -15,12 +15,12 @@ class Scanner extends StatefulWidget {
 
 class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
   late MobileScannerController controller;
-
   StreamSubscription<Object?>? _subscription;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     controller = MobileScannerController(
       facing: ResponsiveBreakpoints.of(context).largerThan(MOBILE)
@@ -28,10 +28,9 @@ class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
           : CameraFacing.back,
       returnImage: true,
     );
+    _subscription?.cancel(); // Cancel any existing subscription
     _subscription = controller.barcodes.listen(_handleBarcode);
     unawaited(controller.start());
-
-    setState(() {});
   }
 
   @override
@@ -43,45 +42,61 @@ class _ScannerState extends State<Scanner> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  _handleBarcode(value) {
-    widget.onScanned(value);
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      controller.start();
+    } else if (state == AppLifecycleState.paused) {
+      controller.stop();
+    }
   }
 
-  _switchCamera() {
+  void _handleBarcode(BarcodeCapture value) {
+    if (mounted) {
+      widget.onScanned(value);
+    }
+  }
+
+  void _switchCamera() {
     controller.switchCamera();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      RotatedBox(
-        quarterTurns:
-            ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
-        child: MobileScanner(
-          controller: controller,
-          onDetect: (value) => _handleBarcode,
+    return Stack(
+      children: [
+        RotatedBox(
+          quarterTurns:
+              ResponsiveBreakpoints.of(context).largerThan(MOBILE) ? 3 : 0,
+          child: MobileScanner(
+            controller: controller,
+            onDetect: _handleBarcode,
+          ),
         ),
-      ),
-      Positioned.fill(
-        bottom: 20,
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
+        Positioned.fill(
+          bottom: 20,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
                 border:
                     Border.all(color: Theme.of(context).colorScheme.primary),
-                borderRadius: BorderRadius.circular(100)),
-            child: IconButton(
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: IconButton(
                 onPressed: () => _switchCamera(),
                 icon: Icon(
                   Icons.cameraswitch_rounded,
                   color: Theme.of(context).colorScheme.primary,
                   size: 40,
-                )),
+                ),
+              ),
+            ),
           ),
         ),
-      )
-    ]);
+      ],
+    );
   }
 }

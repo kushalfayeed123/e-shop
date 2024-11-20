@@ -380,11 +380,12 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
     return sum.toDouble().toString();
   }
 
-  Future _openScanner() {
+  Future _openScanner() async {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    barcodeScanned = false;
 
-    return showDialog(
+    await showDialog(
       context: context,
       builder: (context) => Dialog(
         child: Container(
@@ -393,9 +394,11 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
           child: Scanner(
             onScanned: (BarcodeCapture value) async {
-              if (barcodeScanned == false) {
+              if (!barcodeScanned) {
                 if ((value.barcodes[0].displayValue ?? '').isNotEmpty) {
+                  barcodeScanned = true; // Mark as scanned
                   await _handleBarcode(value, context);
+                  Navigator.of(context).pop();
                 } else {
                   barcodeScanned = false;
                   AppDialog.showErrorDialog(context, 'Code is invalid');
@@ -406,6 +409,7 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
         ),
       ),
     );
+    barcodeScanned = false;
   }
 
   Future<void> _handleBarcode(
@@ -432,7 +436,6 @@ class _CreateOrderState extends ConsumerState<CreateOrder> {
             .addProductToCart(scannedProduct, '1');
 
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        Navigator.of(context).pop();
       } else {
         barcodeScanned = true;
 
